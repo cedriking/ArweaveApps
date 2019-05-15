@@ -1,0 +1,15 @@
+.search-box {
+  @extend .z-depth-1;
+  padding: 20px;
+
+  #search {
+    width: 100%;
+    display: block;
+    margin: 0 auto;
+    padding: 8px 10px;
+    border: 1px solid color('blue', 'lighten-3');
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+  }
+}

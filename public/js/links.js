@@ -92,7 +92,7 @@ class Links {
             this._data.sort((a, b) => a['Unix-Time'] < b['Unix-Time']? 1 : a['Unix-Time'] > b['Unix-Time']? -1 : 0);
             this._data.sort((a, b) => a.title < b.title? 1 : a.title > b.title? -1 : 0);
             for(let i = 0; i < this._data.length -1; i++) {
-                if(this._data[i].title === this._data[i+1].title) {
+                if(this._data[i].title === this._data[i+1].title && this._data[i].from === this._data[i+1].from) {
                     this._data.splice(i, 1);
                 }
             }
@@ -130,6 +130,8 @@ class Links {
 
     async showAll() {
         await this.getAll();
+
+        $('.js-preload-app-list').remove();
 
         this._dataById.forEach(async link => {
             if(links._categories.has(link.category)) {

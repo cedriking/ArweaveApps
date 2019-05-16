@@ -153,12 +153,11 @@
     </div>
 
     <script src="https://unpkg.com/arweave/bundles/web.bundle.min.js"></script>
-    <script src="js/plugins/jquery-3.3.1.min.js"></script>
-    <script src="js/plugins/materialize.min.js"></script>
-
-    <script src="js/accounts.js"></script>
-    <script src="js/links.js"></script>
-    <script src="js/votes.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/bundle.js"></script>
+    <script>
+        $(document).ready(() => {
+            app.init();
+        });
+    </script>
 </body>
 </html>

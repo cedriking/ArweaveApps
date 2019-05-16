@@ -17,8 +17,6 @@ v0.1.0
 - Added preloader in homepage.
 - Removed the typescript files and converted to es6.
 - Separated every class on their own JS file.
-- Moved src/js to public/js since they don't need to be bundled.
-- Hide publish button until the user is logged in.
 - Only the owner of an app can publish that link.
 - Changed the site colors.
 - Removed all typescript related packages and updated gulfile.js

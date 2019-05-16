@@ -3,33 +3,35 @@ String.prototype.capitalize = function() {
 }
 
 class Links {
-    static CATEGORIES = [
-        "games",
-        "gambling",
-        "social",
-        "finance",
-        "development",
-        "media",
-        "wallet",
-        "stores",
-        "security",
-        "governance",
-        "property",
-        "storage",
-        "identity",
-        "energy",
-        "health"
-    ];
-
-    _data = [];
-    _dataById = new Map();
-    _appIcon;
-
-    _categories = new Set();
+    static CATEGORIES() {
+        return [
+            "games",
+            "gambling",
+            "social",
+            "finance",
+            "development",
+            "media",
+            "wallet",
+            "stores",
+            "security",
+            "governance",
+            "property",
+            "storage",
+            "identity",
+            "energy",
+            "health"
+        ];
+    }
 
     constructor() {
-        for(let i = 0, j = Links.CATEGORIES.length; i < j; i++) {
-            this._categories.add(Links.CATEGORIES[i]);
+        this._data = [];
+        this._dataById = new Map();
+        this._appIcon;
+
+        this._categories = new Set();
+
+        for(let i = 0, j = Links.CATEGORIES().length; i < j; i++) {
+            this._categories.add(Links.CATEGORIES()[i]);
         }
     }
 
@@ -276,7 +278,7 @@ class Links {
 
     _showCategories() {
         const optionsHtml = ['<option value="" disabled selected>Choose a category</option>'];
-        Links.CATEGORIES.forEach(category => {
+        Links.CATEGORIES().forEach(category => {
             optionsHtml.push(`<option>${category.capitalize()}</option>`);
         });
         $('#link-category').html(optionsHtml);

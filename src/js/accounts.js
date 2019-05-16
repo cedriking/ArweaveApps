@@ -1,9 +1,4 @@
 class Accounts {
-    walletAddress;
-    walletUser;
-    wallet;
-    loggedIn = false;
-
     init() {
         this._events();
     }

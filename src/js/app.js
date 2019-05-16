@@ -1,15 +1,11 @@
 const arweave = Arweave.init({host: 'arweave.net', port: 443, protocol: 'https'});
 
 class App {
-  _appName = 'arweaveapps';
-  _appVersion = '0.0.1';
-
   constructor() {
-    window.onhashchange = () => this.hashChanged();
+    this._appName = 'arweaveapps';
+    this._appVersion = '0.1.0';
 
-    $(document).ready(() => {
-      app.init();
-    });
+    window.onhashchange = () => this.hashChanged();
   }
 
   init() {

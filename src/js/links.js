@@ -82,8 +82,6 @@ class Links {
                 txRow['linkId'] = data.linkId;
                 txRow['description'] = data.description;
 
-                txRow['votes'] = await votes.getAllByLinkId(id);
-
                 return txRow;
             }));
         }
@@ -96,7 +94,10 @@ class Links {
             const tmp = [];
             const tmpSet = new Set();
             for(let i = 0, j = this._data.length; i < j; i++) {
-                if(!tmpSet.has(`${this._data[i].title}-${this._data[i].from}`)) {
+                if(!tmpSet.has(`${this._data[i].title}-${this._data[i].from}`) && this._categories.has(this._data[i].category)) {
+                    this._data[i].votes = await votes.getAllByLinkId(this._data[i].id);
+                    this._dataById.set(this._data[i].id, this._data[i]);
+
                     tmp.push(this._data[i]);
                     tmpSet.add(`${this._data[i].title}-${this._data[i].from}`);
                 }
@@ -105,10 +106,6 @@ class Links {
 
             // Last sort by votes
             this._data.sort((a, b) => a.votes.length < b.votes.length? 1 : a.votes.length > b.votes.length? -1 : 0);
-
-            for(let i = 0, j = this._data.length; i < j; i++) {
-                this._dataById.set(this._data[i].id, this._data[i]);
-            }
         }
 
         return this._data;
@@ -139,7 +136,7 @@ class Links {
         $('.js-preload-app-list').remove();
 
         this._dataById.forEach(async link => {
-            if(links._categories.has(link.category)) {
+            if(this._categories.has(link.category)) {
                 let $collection;
                 if(!$(`div[data-category="${link.category}"]`).length) {
                     $collection = $('<ul class="collection"></ul>');

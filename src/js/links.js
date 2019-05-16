@@ -96,7 +96,6 @@ class Links {
             const tmp = [];
             const tmpSet = new Set();
             for(let i = 0, j = this._data.length; i < j; i++) {
-                console.log(this._data[i].title, new Date(this._data[i]['unix-time'] * 1000))
                 if(!tmpSet.has(`${this._data[i].title}-${this._data[i].from}`)) {
                     tmp.push(this._data[i]);
                     tmpSet.add(`${this._data[i].title}-${this._data[i].from}`);
@@ -110,8 +109,6 @@ class Links {
             for(let i = 0, j = this._data.length; i < j; i++) {
                 this._dataById.set(this._data[i].id, this._data[i]);
             }
-
-            console.log(this._data);
         }
 
         return this._data;
@@ -181,8 +178,6 @@ class Links {
                 let txRow = {};
                 const tx = await arweave.transactions.get(linkId);
 
-                console.log(tx);
-
                 tx.get('tags').forEach(tag => {
                     let key = tag.get('name', { decode: true, string: true });
                     let value = tag.get('value', { decode: true, string: true });
@@ -201,7 +196,12 @@ class Links {
 
         const optionsHtml = ['<option disabled selected>Select your permaweb</option>'];
         options.forEach((option) => {
-            let title = option.data.match(/<title[^>]*>([^<]+)<\/title>/)[1];
+            let title = option.data.match(/<title[^>]*>([^<]+)<\/title>/);
+            if(title && title.length > 1) {
+                title = title[1];
+            } else {
+                title = "untitledlink";
+            }
             optionsHtml.push(`<option value="${option.id}">${title} (${option.id})</option>`);
         });
 

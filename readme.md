@@ -14,6 +14,7 @@ v0.1.0
 - App owners can now "update" their apps by using the same title while publishing.
 - Homepage now shows the onwer of an app, showing usernames from ArweaveID.
 - Removed all 'alert' and replaced with a 'toast'.
+- Added preloader in homepage.
 - Removed the typescript files and converted to es6.
 - Separated every class on their own JS file.
 - Moved src/js to public/js since they don't need to be bundled.

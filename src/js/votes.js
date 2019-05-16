@@ -38,8 +38,6 @@ class Votes {
         const res = await arweave.api.post(`arql`, queryVotes);
         console.log(`finished fetching votes for app ${linkId}`);
 
-        console.log(app.appName, linkId, res);
-
         let votes = [];
         if(res.data.length) {
             votes = await Promise.all(res.data.map(async id => {
@@ -58,8 +56,6 @@ class Votes {
                 return txRow;
             }))
         }
-
-        console.log(votes);
 
         return votes;
     }

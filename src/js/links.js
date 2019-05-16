@@ -90,22 +90,28 @@ class Links {
 
         this._dataById = new Map();
         if(this._data.length) {
-            // Remove duplicates (older versions, sort by time and then by title)
-            this._data.sort((a, b) => a['Unix-Time'] < b['Unix-Time']? 1 : a['Unix-Time'] > b['Unix-Time']? -1 : 0);
-            this._data.sort((a, b) => a.title < b.title? 1 : a.title > b.title? -1 : 0);
-            for(let i = 0; i < this._data.length -1; i++) {
-                if(this._data[i].title === this._data[i+1].title && this._data[i].from === this._data[i+1].from) {
-                    this._data.splice(i, 1);
+            // Remove duplicates (older versions), sort by time
+            this._data.sort((a, b) => b['unix-time'] - a['unix-time']);
+
+            const tmp = [];
+            const tmpSet = new Set();
+            for(let i = 0, j = this._data.length; i < j; i++) {
+                console.log(this._data[i].title, new Date(this._data[i]['unix-time'] * 1000))
+                if(!tmpSet.has(`${this._data[i].title}-${this._data[i].from}`)) {
+                    tmp.push(this._data[i]);
+                    tmpSet.add(`${this._data[i].title}-${this._data[i].from}`);
                 }
             }
+            this._data = tmp;
 
             // Last sort by votes
-            this._data.sort((a, b) => a['Unix-Time'] < b['Unix-Time']? 1 : a['Unix-Time'] > b['Unix-Time']? -1 : 0);
             this._data.sort((a, b) => a.votes.length < b.votes.length? 1 : a.votes.length > b.votes.length? -1 : 0);
 
             for(let i = 0, j = this._data.length; i < j; i++) {
                 this._dataById.set(this._data[i].id, this._data[i]);
             }
+
+            console.log(this._data);
         }
 
         return this._data;

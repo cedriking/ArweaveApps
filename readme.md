@@ -5,9 +5,23 @@ The main purpose of the site is to work as an indexer for the Arweave permaweb.
 
 This is a work in progress with many features coming soon.
 
-### Future updates
-- What would be the best way to handle an app that already exists but we want to update the link? Should the first publisher be the only one able to edit this? Doesn't sound right.
-
 ### Things I noticed
-- In `src/js/` we have `web.bundle.js` but I decided to use `https://unpkg.com/arweave/bundles/web.bundle.min.js` since in the one I downloaded I had this issue `TypeError: arweave.wallets.ownerToAddress is not a function`.
 - If an account sends a request but it has 0 balance, we get an `http error 400` but `arweave.transactions.sign(tx, wallet);` doesn't throw an error.
+
+### ChangeLog
+```
+v0.1.0
+- App owners can now "update" their apps by using the same title while publishing.
+- Homepage now shows the onwer of an app, showing usernames from ArweaveID.
+- Removed all 'alert' and replaced with a 'toast'.
+- Removed the typescript files and converted to es6.
+- Separated every class on their own JS file.
+- Moved src/js to public/js since they don't need to be bundled.
+- Hide publish button until the user is logged in.
+- Only the owner of an app can publish that link.
+- Changed the site colors.
+- Removed all typescript related packages and updated gulfile.js
+
+v0.0.1
+- initial commit and first test version released.
+```

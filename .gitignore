@@ -87,10 +87,8 @@ typings/
 # DynamoDB Local files
 .dynamodb/
 
-# Testing purposes
+# Arweave private files
 arweave-keyfile.json
-index-old.html
-_listings-old.scss
 
 # idea files
 .idea/
@@ -98,4 +96,3 @@ ArweaveApps.iml
 
 # Dist files
 public/css/
-public/js/

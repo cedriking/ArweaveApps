@@ -47,13 +47,11 @@ strong {
 .apage {
   display: none;
 }
-#app-icon {
-  width: 80px;
-  height: 80px;
-  cursor: pointer;
-}
-#app-image {
-  cursor: pointer;
+#link-icon {
+  width: 82px;
+  height: 82px;
+  border: 1px dashed black;
+  display: block;
 }
 
 .file-input {

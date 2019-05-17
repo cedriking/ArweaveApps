@@ -88,15 +88,19 @@ strong {
     color: black;
   }
 
-  .collection-item.avatar {
-    img {
-      position: absolute;
-      width: 42px;
-      height: 42px;
-      overflow: hidden;
-      left: 15px;
-      display: inline-block;
-      vertical-align: middle;
+  .collection-item {
+    padding: 10px 40px;
+
+    &.avatar {
+      img {
+        position: absolute;
+        width: 42px;
+        height: 42px;
+        overflow: hidden;
+        left: 15px;
+        display: inline-block;
+        vertical-align: middle;
+      }
     }
   }
 

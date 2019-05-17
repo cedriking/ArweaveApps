@@ -96,7 +96,6 @@ class Links {
             for(let i = 0, j = this._data.length; i < j; i++) {
                 if(!tmpSet.has(`${this._data[i].title}-${this._data[i].from}`) && this._categories.has(this._data[i].category)) {
                     this._data[i].votes = await votes.getAllByLinkId(this._data[i].id);
-                    this._dataById.set(this._data[i].id, this._data[i]);
 
                     tmp.push(this._data[i]);
                     tmpSet.add(`${this._data[i].title}-${this._data[i].from}`);
@@ -106,6 +105,10 @@ class Links {
 
             // Last sort by votes
             this._data.sort((a, b) => a.votes.length < b.votes.length? 1 : a.votes.length > b.votes.length? -1 : 0);
+
+            for(let i = 0, j = this._data.length; i < j; i++) {
+                this._dataById.set(this._data[i].id, this._data[i]);
+            }
         }
 
         return this._data;
@@ -146,6 +149,7 @@ class Links {
                 }
 
                 const username = await accounts.getUsername(link.from);
+                const img = (link.appIcon)? `<img src="${link.appIcon}" alt="${link.title}">` : '';
 
                 $collection.append(`
                     <li class="collection-item avatar" data-id="${link.id}">
@@ -155,7 +159,7 @@ class Links {
                         </div>
                     
                         <a href="https://arweave.net/${link.linkId}" target="_blank" rel="nofollow">
-                            <img src="${link.appIcon}" alt="${link.title}">
+                            ${img}
                             <div class="title"><span style="max-width: 100px; float: left;" class="truncate">${username}</span> <span style="margin-left: 5px">/ ${link.title}</span></div>
                             <small>${link.description}</small>
                         </a>
@@ -228,10 +232,6 @@ class Links {
 
         if(description.length < 10 || description.length > 140) {
             return M.toast({html: 'The description must be between 10 and 140 characters.'});
-        }
-
-        if(/*!this.appImage || !this.appImage.length ||*/ !this._appIcon || !this._appIcon.length) {
-            return M.toast({html: 'Permaweb icon is required.'});
         }
 
         if(linkId.length !== 43) {

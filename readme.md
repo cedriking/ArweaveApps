@@ -10,7 +10,11 @@ This is a work in progress with many features coming soon.
 
 ### ChangeLog
 ```
-v0.1.0
+v0.1.1 ()
+- Icon is now optional.
+- Updated the padding on each shown link to prevent clicking the title while click on the vote icon.
+
+v0.1.0 (https://arweave.net/HNciARM0UuSxnZvne6W_jWy2YG08YZFnxKuBr-DtDA8)
 - App owners can now "update" their apps by using the same title while publishing.
 - Homepage now shows the onwer of an app, showing usernames from ArweaveID.
 - Removed all 'alert' and replaced with a 'toast'.

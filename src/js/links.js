@@ -262,7 +262,10 @@ class Links {
     }
 
     addVote(address, id) {
-        this._dataById.set(id, this._dataById.get(id).votes.push({from: address}));
+        const link = this._dataById.get(id);
+        link.votes.push({from: address});
+        this._dataById.set(id, link);
+
         for(let i = 0, j = this._data.length; i < j; i++) {
             if(this._data[i].id === id) {
                 this._data[i].votes.push({from: address});

@@ -34,7 +34,7 @@ class Accounts {
         const txs = await arweave.api.post(`arql`, get_name_query);
 
         if(txs.data.length === 0)
-            return this.walletAddress;
+            return address;
 
         const tx = await arweave.transactions.get((txs.data)[0]);
 

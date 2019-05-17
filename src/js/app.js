@@ -40,10 +40,8 @@ class App {
   }
 
   _events() {
-    $('.modal').modal();
     $('select').formSelect();
   }
-
 
   get appName() {
     return this._appName;

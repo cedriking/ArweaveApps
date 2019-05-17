@@ -1,4 +1,8 @@
 class Accounts {
+    constructor() {
+        this._loginOpen = false;
+    }
+
     init() {
         this._events();
     }
@@ -42,6 +46,7 @@ class Accounts {
     }
 
     showLogin() {
+        this._loginOpen = true;
         $('#modal-login').modal('open');
     }
 
@@ -67,10 +72,36 @@ class Accounts {
         fileReader.readAsText(ev.target.files[0]);
     }
 
+    _containsFiles(event){
+        if (event.dataTransfer.types) {
+            for (var i=0; i<event.dataTransfer.types.length; i++) {
+                if (event.dataTransfer.types[i] == "Files") {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     _events() {
         $('#keyfile').on('change', e => {
             this._login(e);
         });
+
+        $('#modal-login').modal({
+            onCloseEnd: () => {
+                this._loginOpen = false;
+            }
+        });
+
+        document.addEventListener('dragenter', e => {
+            e.preventDefault();
+
+            if(!this._loginOpen && !this.loggedIn && this._containsFiles(e)) {
+                this.showLogin();
+            }
+        }, false);
     }
 }
 const accounts = new Accounts();

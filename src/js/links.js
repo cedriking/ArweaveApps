@@ -149,16 +149,16 @@ class Links {
 
                 $collection.append(`
                     <li class="collection-item avatar" data-id="${link.id}">
+                        <div class="secondary-content center-align">
+                            <a href="#" class="js-vote material-icons">arrow_drop_up</a>
+                            <span class="app-votes">${link.votes.length}</span>
+                        </div>
+                    
                         <a href="https://arweave.net/${link.linkId}" target="_blank" rel="nofollow">
                             <img src="${link.appIcon}" alt="${link.title}">
                             <div class="title"><span style="max-width: 100px; float: left;" class="truncate">${username}</span> <span style="margin-left: 5px">/ ${link.title}</span></div>
                             <small>${link.description}</small>
                         </a>
-    
-                        <div class="secondary-content center-align">
-                            <a href="#" class="js-vote material-icons">arrow_drop_up</a>
-                            <span class="app-votes">${link.votes.length}</span>
-                        </div>
                     </li>`);
             }
 

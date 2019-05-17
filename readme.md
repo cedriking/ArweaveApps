@@ -1,5 +1,5 @@
 # ArweaveApps
-This is the source code for the ArweaveApps located at https://arweave.net/HNciARM0UuSxnZvne6W_jWy2YG08YZFnxKuBr-DtDA8
+This is the source code for the ArweaveApps located at https://arweave.net/35IFq9BcIgpSPti9YDYDiaQy4wMfMIKZ25t7hHZrhek
 
 The main purpose of the site is to work as an indexer for the Arweave permaweb.
 
@@ -10,9 +10,12 @@ This is a work in progress with many features coming soon.
 
 ### ChangeLog
 ```
-v0.1.1 ()
-- Icon is now optional.
+v0.1.1 (https://arweave.net/35IFq9BcIgpSPti9YDYDiaQy4wMfMIKZ25t7hHZrhek)
+- Drag your wallet file and the login popup will appear!
+- Icons are now optional.
+- Updated sort for links.
 - Updated the padding on each shown link to prevent clicking the title while click on the vote icon.
+- Solved a small bug when clicking vote for the same app a second time without a refresh caused a JS error.
 
 v0.1.0 (https://arweave.net/HNciARM0UuSxnZvne6W_jWy2YG08YZFnxKuBr-DtDA8)
 - App owners can now "update" their apps by using the same title while publishing.

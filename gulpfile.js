@@ -2,15 +2,13 @@ const gulp = require('gulp');
 const rename = require('gulp-rename');
 const sass = require('gulp-sass');
 const autoprefixer = require('gulp-autoprefixer');
-const minifycss = require('gulp-minify-css');
-const babel = require('gulp-babel');
 const concat = require('gulp-concat');
 
 sass.compiler = require('node-sass');
 
 const paths = {
     js: {
-        src: 'src/js/**/*.js',
+        src: ['src/js/plugins/**/*.js', 'src/js/*.js'],
         dest: 'public/js/'
     },
     sass: {

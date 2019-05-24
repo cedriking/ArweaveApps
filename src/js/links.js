@@ -1,6 +1,6 @@
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
-}
+};
 
 class Links {
     static CATEGORIES() {
@@ -33,6 +33,34 @@ class Links {
         for(let i = 0, j = Links.CATEGORIES().length; i < j; i++) {
             this._categories.add(Links.CATEGORIES()[i]);
         }
+
+        this._sortByVotes = cw((data) => {
+            return data.sort((a, b) => a.votes.length < b.votes.length? 1 : a.votes.length > b.votes.length? -1 : 0);
+        });
+
+        this._createDataById = cw((data) => {
+            const dataById = new Map();
+            for(let i = 0, j = data.length; i < j; i++) {
+                dataById.set(data[i].id, data[i]);
+            }
+
+            return dataById;
+        });
+
+        this._getUserPermawebs = cw((options) => {
+            const optionsHtml = ['<option disabled selected>Select your permaweb</option>'];
+            options.forEach((option) => {
+                let title = option.data.match(/<title[^>]*>([^<]+)<\/title>/);
+                if(title && title.length > 1) {
+                    title = title[1];
+                } else {
+                    title = "untitledlink";
+                }
+                optionsHtml.push(`<option value="${option.id}">${title} (${option.id})</option>`);
+            });
+
+            return optionsHtml;
+        });
     }
 
     init() {
@@ -96,19 +124,16 @@ class Links {
             for(let i = 0, j = this._data.length; i < j; i++) {
                 if(!tmpSet.has(`${this._data[i].title}-${this._data[i].from}`) && this._categories.has(this._data[i].category)) {
                     this._data[i].votes = await votes.getAllByLinkId(this._data[i].id);
+                    this._data[i].fromUser = await accounts.getUsername(this._data[i].from);
 
                     tmp.push(this._data[i]);
                     tmpSet.add(`${this._data[i].title}-${this._data[i].from}`);
                 }
             }
-            this._data = tmp;
 
-            // Last sort by votes
-            this._data.sort((a, b) => a.votes.length < b.votes.length? 1 : a.votes.length > b.votes.length? -1 : 0);
-
-            for(let i = 0, j = this._data.length; i < j; i++) {
-                this._dataById.set(this._data[i].id, this._data[i]);
-            }
+            // Sort by votes
+            this._data = await this._sortByVotes.data(tmp);
+            this._dataById = await this._createDataById.data(this._data);
         }
 
         return this._data;
@@ -136,6 +161,12 @@ class Links {
     async showAll() {
         await this.getAll();
 
+        // TODO: Convert all this to webworker
+        /*this._convertAllToHtml = cw((dataById, categories) => {
+            const _categories = [];
+
+        });*/
+
         $('.js-preload-app-list').remove();
 
         this._dataById.forEach(async link => {
@@ -148,7 +179,6 @@ class Links {
                     $collection = $(`div[data-category="${link.category}"]`).find('.collection');
                 }
 
-                const username = await accounts.getUsername(link.from);
                 const img = (link.appIcon)? `<img src="${link.appIcon}" alt="${link.title}">` : '';
 
                 $collection.append(`
@@ -160,7 +190,7 @@ class Links {
                     
                         <a href="https://arweave.net/${link.linkId}" target="_blank" rel="nofollow">
                             ${img}
-                            <div class="title"><span style="max-width: 100px; float: left;" class="truncate">${username}</span> <span style="margin-left: 5px">/ ${link.title}</span></div>
+                            <div class="title"><span style="max-width: 100px; float: left;" class="truncate">${link.fromUser}</span> <span style="margin-left: 5px">/ ${link.title}</span></div>
                             <small>${link.description}</small>
                         </a>
                     </li>`);
@@ -195,16 +225,7 @@ class Links {
             }));
         }
 
-        const optionsHtml = ['<option disabled selected>Select your permaweb</option>'];
-        options.forEach((option) => {
-            let title = option.data.match(/<title[^>]*>([^<]+)<\/title>/);
-            if(title && title.length > 1) {
-                title = title[1];
-            } else {
-                title = "untitledlink";
-            }
-            optionsHtml.push(`<option value="${option.id}">${title} (${option.id})</option>`);
-        });
+        const optionsHtml = this._getUserPermawebs(options);
 
         $('#link-link').html(optionsHtml);
         $('select').formSelect();
@@ -320,7 +341,6 @@ class Links {
             }
         });
     }
-
 
     get data() {
         return this._data;

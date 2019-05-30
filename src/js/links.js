@@ -240,7 +240,7 @@ class Links {
             }));
         }
 
-        const optionsHtml = this._getUserPermawebs(options);
+        const optionsHtml = await this._getUserPermawebs.data(options);
 
         $('#link-link').html(optionsHtml);
         $('select').formSelect();

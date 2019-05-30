@@ -3,7 +3,7 @@ const arweave = Arweave.init({host: 'arweave.net', port: 443, protocol: 'https'}
 class App {
   constructor() {
     this._appName = 'arweaveapps';
-    this._appVersion = '0.1.0';
+    this._appVersion = '0.1.1';
 
     window.onhashchange = () => this.hashChanged();
   }

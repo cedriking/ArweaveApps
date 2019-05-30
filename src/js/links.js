@@ -47,6 +47,10 @@ class Links {
             return dataById;
         });
 
+        this._sortByDate = cw((data) => {
+            return data.sort((a, b) => +b['unix-time'] - +a['unix-time']);
+        });
+
         this._getUserPermawebs = cw((options) => {
             const optionsHtml = ['<option disabled selected>Select your permaweb</option>'];
             options.forEach((option) => {
@@ -60,6 +64,50 @@ class Links {
             });
 
             return optionsHtml;
+        });
+
+        this._convertAllToHtml = cw((data) => {
+            const {dataById, categories} = data;
+            const _categories = new Map();
+
+            let html = '';
+            dataById.forEach(async link => {
+                const isCategory = categories.findIndex(l => l.toLowerCase() === link.category.toLowerCase());
+                if(isCategory === -1) return true;
+
+                let collection = '';
+                if(_categories.has(link.category)) {
+                    collection = _categories.get(link.category);
+                } else {
+                    collection = `<div data-category="${link.category}" class="col s12"><h5>${link.category.toUpperCase()}</h5><ul class="collection">`;
+                }
+
+                const img = link.appIcon ? `<img src="${link.appIcon}" alt="${link.title}">` : '';
+
+                collection += `
+                    <li class="collection-item avatar" data-id="${link.id}">
+                        <div class="secondary-content center-align">
+                            <a href="#" class="js-vote material-icons">arrow_drop_up</a>
+                            <span class="app-votes">${link.votes.length}</span>
+                        </div>
+                    
+                        <a href="https://arweave.net/${link.linkId}" target="_blank" rel="nofollow">
+                            ${img}
+                            <div class="title"><span style="max-width: 100px; float: left;" class="truncate">${link.fromUser}</span> <span style="margin-left: 5px">/ ${link.title}</span></div>
+                            <small>${link.description}</small>
+                        </a>
+                    </li>`;
+
+                _categories.set(link.category, collection);
+            });
+
+            const catsData = Array.from(_categories);
+            catsData.sort((a, b) => a[0] > b[0]? 1 : a[0] < b[0]? -1 : 0);
+            catsData.forEach(cat => {
+                html += `${cat[1]}</ul></div>`;
+            });
+
+            return html;
         });
     }
 
@@ -117,13 +165,13 @@ class Links {
         this._dataById = new Map();
         if(this._data.length) {
             // Remove duplicates (older versions), sort by time
-            this._data.sort((a, b) => +b['unix-time'] - +a['unix-time']);
+            this._data = await this._sortByDate.data(this._data);
 
             const tmp = [];
             const tmpSet = new Set();
             for(let i = 0, j = this._data.length; i < j; i++) {
                 if(!tmpSet.has(`${this._data[i].title}-${this._data[i].from}`) && this._categories.has(this._data[i].category)) {
-                    this._data[i].votes = await votes.getAllByLinkId(this._data[i].id);
+                    this._data[i].votes = await votes.getVotesByLinkId(this._data[i].id);
                     this._data[i].fromUser = await accounts.getUsername(this._data[i].from);
 
                     tmp.push(this._data[i]);
@@ -159,51 +207,18 @@ class Links {
     }
 
     async showAll() {
+        await votes.getAllVotes();
         await this.getAll();
 
-        // TODO: Convert all this to webworker
-        /*this._convertAllToHtml = cw((dataById, categories) => {
-            const _categories = [];
-
-        });*/
-
-        $('.js-preload-app-list').remove();
-
-        this._dataById.forEach(async link => {
-            if(this._categories.has(link.category)) {
-                let $collection;
-                if(!$(`div[data-category="${link.category}"]`).length) {
-                    $collection = $('<ul class="collection"></ul>');
-                    $('.js-app-list').append($(`<div data-category="${link.category}" class="col s12 l6"><h5>${link.category.toUpperCase()}</h5></div>`).append($collection));
-                } else {
-                    $collection = $(`div[data-category="${link.category}"]`).find('.collection');
-                }
-
-                const img = (link.appIcon)? `<img src="${link.appIcon}" alt="${link.title}" width="60">` : '';
-
-                $collection.append(`
-                    <li class="collection-item avatar" data-id="${link.id}">
-                        <div class="secondary-content center-align">
-                            <a href="#" class="js-vote material-icons">arrow_drop_up</a>
-                            <span class="app-votes">${link.votes.length}</span>
-                        </div>
-                    
-                        <a href="https://arweave.net/${link.linkId}" target="_blank" rel="nofollow">
-                            ${img}
-                            <div class="title"><span style="max-width: 100px; float: left;" class="truncate">${link.fromUser}</span> <span style="margin-left: 5px">/ ${link.title}</span></div>
-                            <small>${link.description}</small>
-                        </a>
-                    </li>`);
-            }
-
-            return true;
-        });
+        const html = await this._convertAllToHtml.data({dataById: this._dataById, categories: Links.CATEGORIES()});
+        $('.js-app-list').html(html);
+        app
     }
 
     async showAllLinksByAccount(address) {
         const linksId = await this.getAllLinksByAccount(address);
 
-        let options =[];
+        let options = [];
         if(linksId && linksId.length) {
             options = await Promise.all(linksId.map(async linkId => {
                 let txRow = {};

@@ -1,42 +1,57 @@
 class Votes {
+    constructor() {
+        this._votes = [];
+
+        this.getVotesWorker = cw((votes) => {
+            let newVotes = [];
+            for(let i = 0, j = votes.length; i < j; i++) {
+                const vote = votes[i];
+
+                if(vote['link-id'] === undefined) continue;
+
+                let voteIndex = newVotes.findIndex((v) => v['link-id'] === vote['link-id']);
+                if(voteIndex >= 0) {
+                    let hasUserVoted = newVotes[voteIndex].votes.filter(v => v === vote.from);
+                    if(hasUserVoted.length) continue;
+
+                    newVotes[voteIndex].votes.push(vote.from);
+                } else {
+                    newVotes.push({'link-id': vote['link-id'], votes: [vote.from]});
+                }
+            }
+
+            return newVotes;
+        });
+
+        this.getVotesByLinkIdWorker = cw((d) => {
+            let vote = d.votes.find(v => v['link-id'] === d.linkId);
+
+            return (vote? vote.votes : []);
+        });
+    }
+
     init() {
         this._events();
     }
 
-    async getAllByLinkId(linkId) {
+    async getAllVotes() {
         const queryVotes = {
             op: 'and',
             expr1: {
-                op: 'and',
-                expr1: {
-                    op: 'equals',
-                    expr1: 'App-Name',
-                    expr2: app.appName
-                },
-                expr2: {
-                    op: 'equals',
-                    expr1: 'Type',
-                    expr2: 'vote',
-                }
+                op: 'equals',
+                expr1: 'App-Name',
+                expr2: app.appName
             },
             expr2: {
-                op: 'and',
-                expr1: {
-                    op: 'equals',
-                    expr1: 'Link-Id',
-                    expr2: linkId
-                },
-                expr2: {
-                    op: 'equals',
-                    expr1: 'Type',
-                    expr2: 'vote'
-                }
+                op: 'equals',
+                expr1: 'Type',
+                expr2: 'vote',
             }
         };
 
-        console.log(`fetching votes for app ${linkId}...`);
+        console.log(`fetching all votes...`);
         const res = await arweave.api.post(`arql`, queryVotes);
-        console.log(`finished fetching votes for app ${linkId}`);
+        console.log('finished fetching votes');
 
         let votes = [];
         if(res.data.length) {
@@ -54,10 +69,16 @@ class Votes {
                 txRow['from'] = await arweave.wallets.ownerToAddress(tx.owner);
 
                 return txRow;
-            }))
+            }));
         }
 
-        return votes;
+        this._votes = await this.getVotesWorker.data(votes);
+
+        return this._votes;
+    }
+
+    async getVotesByLinkId(linkId) {
+        return await this.getVotesByLinkIdWorker.data({votes: this._votes, linkId});
     }
 
     async publish(linkId) {

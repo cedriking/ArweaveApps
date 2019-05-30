@@ -117,7 +117,7 @@ class Links {
         this._dataById = new Map();
         if(this._data.length) {
             // Remove duplicates (older versions), sort by time
-            this._data.sort((a, b) => b['unix-time'] - a['unix-time']);
+            this._data.sort((a, b) => +b['unix-time'] - +a['unix-time']);
 
             const tmp = [];
             const tmpSet = new Set();
@@ -179,7 +179,7 @@ class Links {
                     $collection = $(`div[data-category="${link.category}"]`).find('.collection');
                 }
 
-                const img = (link.appIcon)? `<img src="${link.appIcon}" alt="${link.title}">` : '';
+                const img = (link.appIcon)? `<img src="${link.appIcon}" alt="${link.title}" width="60">` : '';
 
                 $collection.append(`
                     <li class="collection-item avatar" data-id="${link.id}">

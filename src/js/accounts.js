@@ -1,5 +1,6 @@
 class Accounts {
     constructor() {
+        this._data = new Map();
         this._loginOpen = false;
     }
 
@@ -8,6 +9,10 @@ class Accounts {
     }
 
     async getUsername(address = this.walletAddress) {
+        if(this._data.has(address)) {
+            return this._data.get(address);
+        }
+
         let get_name_query =
             {
                 op: 'and',
@@ -42,7 +47,11 @@ class Accounts {
 
         const tx = await arweave.transactions.get((txs.data)[0]);
 
-        return tx.get('data', {decode: true, string: true})
+        const username = tx.get('data', {decode: true, string: true});
+
+        this._data.set(address, username);
+
+        return username;
     }
 
     showLogin() {

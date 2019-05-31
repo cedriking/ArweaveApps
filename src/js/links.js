@@ -137,6 +137,10 @@ class Links {
         this._data = [];
         if(res.data.length) {
             this._data = await Promise.all(res.data.map(async function(id) {
+                if(window.localStorage.getItem(id)) {
+                    return JSON.parse(window.localStorage.getItem(id));
+                }
+
                 let txRow = {};
                 var tx = await arweave.transactions.get(id);
 
@@ -156,6 +160,7 @@ class Links {
                 txRow['linkId'] = data.linkId;
                 txRow['description'] = data.description;
 
+                window.localStorage.setItem(id, JSON.stringify(txRow));
                 return txRow;
             }));
         }

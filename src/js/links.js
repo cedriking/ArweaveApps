@@ -26,7 +26,7 @@ class Links {
     constructor() {
         this._data = [];
         this._dataById = new Map();
-        this._appIcon;
+        this._appIcon = '';
 
         this._categories = new Set();
 
@@ -34,57 +34,54 @@ class Links {
             this._categories.add(Links.CATEGORIES()[i]);
         }
 
-        this._sortByVotes = cw((data) => {
-            return data.sort((a, b) => a.votes.length < b.votes.length? 1 : a.votes.length > b.votes.length? -1 : 0);
-        });
-
-        this._createDataById = cw((data) => {
-            const dataById = new Map();
-            for(let i = 0, j = data.length; i < j; i++) {
-                dataById.set(data[i].id, data[i]);
-            }
-
-            return dataById;
-        });
-
-        this._sortByDate = cw((data) => {
-            return data.sort((a, b) => +b['unix-time'] - +a['unix-time']);
-        });
-
-        this._getUserPermawebs = cw((options) => {
-            const optionsHtml = ['<option disabled selected>Select your permaweb</option>'];
-            options.forEach((option) => {
-                let title = option.data.match(/<title[^>]*>([^<]+)<\/title>/);
-                if(title && title.length > 1) {
-                    title = title[1];
-                } else {
-                    title = "untitledlink";
-                }
-                optionsHtml.push(`<option value="${option.id}">${title} (${option.id})</option>`);
-            });
-
-            return optionsHtml;
-        });
-
-        this._convertAllToHtml = cw((data) => {
-            const {dataById, categories} = data;
-            const _categories = new Map();
-
-            let html = '';
-            dataById.forEach(async link => {
-                const isCategory = categories.findIndex(l => l.toLowerCase() === link.category.toLowerCase());
-                if(isCategory === -1) return true;
-
-                let collection = '';
-                if(_categories.has(link.category)) {
-                    collection = _categories.get(link.category);
-                } else {
-                    collection = `<div data-category="${link.category}" class="col s12"><h5>${link.category.toUpperCase()}</h5><ul class="collection">`;
+        this._workers = operative({
+            sortByVotes: function(data) {
+                this.deferred().fulfill(data.sort((a, b) => a.votes.length < b.votes.length? 1 : a.votes.length > b.votes.length? -1 : 0));
+            },
+            sortByDate: function(data) {
+                this.deferred().fulfill(data.sort((a, b) => +b['unix-time'] - +a['unix-time']));
+            },
+            createDataById: function(data) {
+                const dataById = new Map();
+                for(let i = 0, j = data.length; i < j; i++) {
+                    dataById.set(data[i].id, data[i]);
                 }
 
-                const img = link.appIcon ? `<img src="${link.appIcon}" alt="${link.title}">` : '';
+                this.deferred().fulfill(dataById);
+            },
+            getUserPermawebs: function(options) {
+                const optionsHtml = ['<option disabled selected>Select your permaweb</option>'];
+                options.forEach((option) => {
+                    let title = option.data.match(/<title[^>]*>([^<]+)<\/title>/);
+                    if(title && title.length > 1) {
+                        title = title[1];
+                    } else {
+                        title = "untitledlink";
+                    }
+                    optionsHtml.push(`<option value="${option.id}">${title} (${option.id})</option>`);
+                });
 
-                collection += `
+                this.deferred().fulfill(optionsHtml);
+            },
+            convertAllToHtml: function(data) {
+                const {dataById, categories} = data;
+                const _categories = new Map();
+
+                let html = '';
+                dataById.forEach(async link => {
+                    const isCategory = categories.findIndex(l => l.toLowerCase() === link.category.toLowerCase());
+                    if(isCategory === -1) return true;
+
+                    let collection = '';
+                    if(_categories.has(link.category)) {
+                        collection = _categories.get(link.category);
+                    } else {
+                        collection = `<div data-category="${link.category}" class="col s12"><h5>${link.category.toUpperCase()}</h5><ul class="collection">`;
+                    }
+
+                    const img = link.appIcon ? `<img src="${link.appIcon}" alt="${link.title}">` : '';
+
+                    collection += `
                     <li class="collection-item avatar" data-id="${link.id}">
                         <div class="secondary-content center-align">
                             <a href="#" class="js-vote material-icons">arrow_drop_up</a>
@@ -98,16 +95,17 @@ class Links {
                         </a>
                     </li>`;
 
-                _categories.set(link.category, collection);
-            });
+                    _categories.set(link.category, collection);
+                });
 
-            const catsData = Array.from(_categories);
-            catsData.sort((a, b) => a[0] > b[0]? 1 : a[0] < b[0]? -1 : 0);
-            catsData.forEach(cat => {
-                html += `${cat[1]}</ul></div>`;
-            });
+                const catsData = Array.from(_categories);
+                catsData.sort((a, b) => a[0] > b[0]? 1 : a[0] < b[0]? -1 : 0);
+                catsData.forEach(cat => {
+                    html += `${cat[1]}</ul></div>`;
+                });
 
-            return html;
+                this.deferred().fulfill(html);
+            }
         });
     }
 
@@ -165,7 +163,7 @@ class Links {
         this._dataById = new Map();
         if(this._data.length) {
             // Remove duplicates (older versions), sort by time
-            this._data = await this._sortByDate.data(this._data);
+            this._data = await this._workers.sortByDate(this._data);
 
             const tmp = [];
             const tmpSet = new Set();
@@ -180,8 +178,8 @@ class Links {
             }
 
             // Sort by votes
-            this._data = await this._sortByVotes.data(tmp);
-            this._dataById = await this._createDataById.data(this._data);
+            this._data = await this._workers.sortByVotes(tmp);
+            this._dataById = await this._workers.createDataById(this._data);
         }
 
         return this._data;
@@ -210,9 +208,8 @@ class Links {
         await votes.getAllVotes();
         await this.getAll();
 
-        const html = await this._convertAllToHtml.data({dataById: this._dataById, categories: Links.CATEGORIES()});
+        const html = await this._workers.convertAllToHtml({dataById: this._dataById, categories: Links.CATEGORIES()});
         $('.js-app-list').html(html);
-        app
     }
 
     async showAllLinksByAccount(address) {
@@ -240,7 +237,7 @@ class Links {
             }));
         }
 
-        const optionsHtml = await this._getUserPermawebs.data(options);
+        const optionsHtml = await this._workers.getUserPermawebs(options);
 
         $('#link-link').html(optionsHtml);
         $('select').formSelect();

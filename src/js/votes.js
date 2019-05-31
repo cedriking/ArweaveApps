@@ -2,31 +2,31 @@ class Votes {
     constructor() {
         this._votes = [];
 
-        this.getVotesWorker = cw((votes) => {
-            let newVotes = [];
-            for(let i = 0, j = votes.length; i < j; i++) {
-                const vote = votes[i];
+        this._workers = operative({
+            getVotes: function(votes) {
+                let newVotes = [];
+                for(let i = 0, j = votes.length; i < j; i++) {
+                    const vote = votes[i];
 
-                if(vote['link-id'] === undefined) continue;
+                    if(vote['link-id'] === undefined) continue;
 
-                let voteIndex = newVotes.findIndex((v) => v['link-id'] === vote['link-id']);
-                if(voteIndex >= 0) {
-                    let hasUserVoted = newVotes[voteIndex].votes.filter(v => v === vote.from);
-                    if(hasUserVoted.length) continue;
+                    let voteIndex = newVotes.findIndex((v) => v['link-id'] === vote['link-id']);
+                    if(voteIndex >= 0) {
+                        let hasUserVoted = newVotes[voteIndex].votes.filter(v => v === vote.from);
+                        if(hasUserVoted.length) continue;
 
-                    newVotes[voteIndex].votes.push(vote.from);
-                } else {
-                    newVotes.push({'link-id': vote['link-id'], votes: [vote.from]});
+                        newVotes[voteIndex].votes.push(vote.from);
+                    } else {
+                        newVotes.push({'link-id': vote['link-id'], votes: [vote.from]});
+                    }
                 }
+
+                this.deferred().fulfill(newVotes);
+            },
+            getVotesByLinkId: function(d) {
+                let vote = d.votes.find(v => v['link-id'] === d.linkId);
+                this.deferred().fulfill(vote? vote.votes : []);
             }
-
-            return newVotes;
-        });
-
-        this.getVotesByLinkIdWorker = cw((d) => {
-            let vote = d.votes.find(v => v['link-id'] === d.linkId);
-
-            return (vote? vote.votes : []);
         });
     }
 
@@ -72,13 +72,13 @@ class Votes {
             }));
         }
 
-        this._votes = await this.getVotesWorker.data(votes);
+        this._votes = await this._workers.getVotes(votes);
 
         return this._votes;
     }
 
     async getVotesByLinkId(linkId) {
-        return await this.getVotesByLinkIdWorker.data({votes: this._votes, linkId});
+        return await this._workers.getVotesByLinkId({votes: this._votes, linkId});
     }
 
     async publish(linkId) {

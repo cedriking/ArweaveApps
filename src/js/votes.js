@@ -56,6 +56,10 @@ class Votes {
         let votes = [];
         if(res.data.length) {
             votes = await Promise.all(res.data.map(async id => {
+                if(window.localStorage.getItem(id)) {
+                    return JSON.parse(window.localStorage.getItem(id));
+                }
+
                 let txRow = {};
                 const tx = await arweave.transactions.get(id);
 
@@ -68,6 +72,7 @@ class Votes {
                 txRow['id'] = id;
                 txRow['from'] = await arweave.wallets.ownerToAddress(tx.owner);
 
+                window.localStorage.setItem(id, JSON.stringify(txRow));
                 return txRow;
             }));
         }

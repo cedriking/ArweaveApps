@@ -3,8 +3,6 @@ This is the source code for the ArweaveApps.
 
 The main purpose of the site is to work as an indexer for the Arweave permaweb.
 
-This is a work in progress with many features coming soon.
-
 ### Things I noticed
 - If an account sends a request but it has 0 balance, we get an `http error 400` but `arweave.transactions.sign(tx, wallet);` doesn't throw an error.
 

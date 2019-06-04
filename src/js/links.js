@@ -27,6 +27,7 @@ class Links {
         this._data = [];
         this._dataById = new Map();
         this._appIcon = '';
+        this._contentLoaded = false;
 
         this._categories = new Set();
 
@@ -67,6 +68,24 @@ class Links {
                 const {dataById, categories} = data;
                 const _categories = new Map();
 
+                function toSlug(str) {
+                    str = str.replace(/^\s+|\s+$/g, ''); // trim
+                    str = str.toLowerCase();
+
+                    // remove accents, swap ñ for n, etc
+                    const from = "ãàáäâẽèéëêìíïîõòóöôùúüûñç·/_,:;";
+                    const to   = "aaaaaeeeeeiiiiooooouuuunc------";
+                    for (let i=0, l=from.length ; i<l ; i++) {
+                        str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+                    }
+
+                    str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+                        .replace(/\s+/g, '-') // collapse whitespace and replace by -
+                        .replace(/-+/g, '-'); // collapse dashes
+
+                    return str;
+                }
+
                 let html = '';
                 dataById.forEach(async link => {
                     const isCategory = categories.findIndex(l => l.toLowerCase() === link.category.toLowerCase());
@@ -82,13 +101,13 @@ class Links {
                     const img = link.appIcon ? `<img src="${link.appIcon}" alt="${link.title}">` : '';
 
                     collection += `
-                    <li class="collection-item avatar" data-id="${link.id}">
+                    <li class="collection-item avatar" data-id="${link.id}" data-repository="${toSlug(link.fromUser)}/${toSlug(link.title)}">
                         <div class="secondary-content center-align">
                             <a href="#" class="js-vote material-icons">arrow_drop_up</a>
                             <span class="app-votes">${link.votes.length}</span>
                         </div>
                     
-                        <a href="https://arweave.net/${link.linkId}" target="_blank" rel="nofollow">
+                        <a href="https://arweave.net/${link.linkId}" target="_blank" rel="nofollow" class="js-addy-link">
                             ${img}
                             <div class="title"><span style="max-width: 100px; float: left;" class="truncate">${link.fromUser}</span> <span style="margin-left: 5px">/ ${link.title}</span></div>
                             <small>${link.description}</small>
@@ -113,6 +132,24 @@ class Links {
         this._events();
         this.showAll().catch(console.log);
         this._showCategories();
+    }
+
+    toSlug(str) {
+        str = str.replace(/^\s+|\s+$/g, ''); // trim
+        str = str.toLowerCase();
+
+        // remove accents, swap ñ for n, etc
+        const from = "ãàáäâẽèéëêìíïîõòóöôùúüûñç·/_,:;";
+        const to   = "aaaaaeeeeeiiiiooooouuuunc------";
+        for (let i=0, l=from.length ; i<l ; i++) {
+            str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+        }
+
+        str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+            .replace(/\s+/g, '-') // collapse whitespace and replace by -
+            .replace(/-+/g, '-'); // collapse dashes
+
+        return str;
     }
 
     async getAll() {
@@ -215,6 +252,7 @@ class Links {
 
         const html = await this._workers.convertAllToHtml({dataById: this._dataById, categories: Links.CATEGORIES()});
         $('.js-app-list').html(html);
+        this._contentLoaded = true;
     }
 
     async showAllLinksByAccount(address) {
@@ -365,6 +403,10 @@ class Links {
 
     get dataById() {
         return this._dataById;
+    }
+
+    get contentLoaded() {
+        return this._contentLoaded;
     }
 }
 const links = new Links();

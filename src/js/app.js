@@ -29,6 +29,20 @@ class App {
         page = 'home';
       } else if(newPage === 'home' || newPage === 'publish' || newPage === 'view') {
         page = newPage;
+      } else if(newPage.indexOf('/') > 0) {
+        const go = () => {
+          if(!links.contentLoaded) {
+            return setTimeout(() => go(), 100);
+          }
+
+          const link = newPage.split('/');
+          const $elem = $(`[data-repository="${links.toSlug(link[0])}/${links.toSlug(link[1])}"]`);
+          if($elem.length) {
+            window.location.href = $elem.find('.js-addy-link').attr('href');
+          }
+        };
+        console.log(newPage.split('/'));
+        go();
       }
     }
 

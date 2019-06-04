@@ -1,5 +1,5 @@
 # ArweaveApps
-This is the source code for the ArweaveApps located at https://arweave.net/35IFq9BcIgpSPti9YDYDiaQy4wMfMIKZ25t7hHZrhek
+This is the source code for the ArweaveApps.
 
 The main purpose of the site is to work as an indexer for the Arweave permaweb.
 

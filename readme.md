@@ -10,6 +10,10 @@ This is a work in progress with many features coming soon.
 
 ### ChangeLog
 ```
+v0.1.2 (https://arweave.net/S6VgPIIUPxg6M9W89RaUInrrZF0FjBCEsEYlNI7U0Ys)
+- Added webworkers + cache for faster loading time.
+- Now apps can be directly linked to the latest version! (ex: http://arweaveapps.com/#Zeus/Archive)
+
 v0.1.1 (https://arweave.net/35IFq9BcIgpSPti9YDYDiaQy4wMfMIKZ25t7hHZrhek)
 - Drag your wallet file and the login popup will appear!
 - Icons are now optional.

@@ -8,6 +8,9 @@ The main purpose of the site is to work as an indexer for the Arweave permaweb.
 
 ### ChangeLog
 ```
+v0.1.3 (https://arweave.net/fT3yafT-jSp4nOc_SfuUz5JhAD2OGkxQo8g9VX-azeM)
+- Updated the design
+
 v0.1.2 (https://arweave.net/S6VgPIIUPxg6M9W89RaUInrrZF0FjBCEsEYlNI7U0Ys)
 - Added webworkers + cache for faster loading time.
 - Now apps can be directly linked to the latest version! (ex: http://arweaveapps.com/#Zeus/Archive)

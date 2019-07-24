@@ -11,30 +11,23 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css">
 </head>
-<body>
+<body class="grey lighten-4">
     <header>
         <nav>
-            <div class="nav-wrapper">
-                <a href="#" class="brand-logo">Arweave<span class="amber-text text-darken-1">Apps</span></a>
+            <div class="nav-wrapper grey lighten-5">
+                <a href="#" class="brand-logo">ArweaveApps</a>
                 <ul class="right">
                     <li class="js-page-active" data-page="home"><a href="#">Home</a></li>
                     <!--<li class="js-page-active" data-page="categories"><a href="#">Categories</a></li>
                     <li class="js-page-active" data-page="rankings"><a href="#">Rankings</a></li>
                     <li class="js-page-active" data-page="stats"><a href="#">Stats</a></li>-->
-                    <!--<li><a href="#modal-login" class="modal-trigger">Login</a></li>-->
+                    <li class="js-logged-out"><a href="#modal-login" class="modal-trigger">Login</a></li>
+                    <li class="js-logged-in hide"><a href="#logout">Logout</a></li>
                     <li class="hide-on-small-only"><a href="#publish" class="js-go-publish btn-small white black-text waves-effect">Publish App</a></li>
                 </ul>
             </div>
         </nav>
     </header>
-    <div class="row account-box right-align">
-        <div class="js-logged-in hide">
-            Welcome back, <strong></strong> | <a href="#logout">Logout</a>
-        </div>
-        <div class="js-logged-out">
-            Hi there! | <a href="#modal-login" class="modal-trigger">Login</a>
-        </div>
-    </div>
 
     <div class="row hide-on-med-and-up">
         <div class="col s12 right-align">
@@ -130,7 +123,7 @@
 
     <footer class="row">
         <div class="col s12 m6">
-            Built with <img src="img/like.png" alt="" width="18"> by <a href="https://github.com/GoldZeus" target="_blank" rel="nofollow">GoldZeus</a>
+            Built with <img src="img/like.png" alt="" width="18"> by <a href="https://github.com/cedriking" target="_blank" rel="nofollow">Cedriking</a>
         </div>
         <div class="col s12 m6 right-align">
             <a href="https://arweave.net/27WsYOcNHWweInDArUK94_GsBeuQKPXalsnwVPPRfe4?to=BPr7vrFduuQqqVMu_tftxsScTKUq9ke0rx4q5C9ieQU" target="_blank" rel="nofollow"><img src="img/contact.png" alt="" width="30"></a>
@@ -153,7 +146,6 @@
         </div>
     </div>
 
-    <script src="https://unpkg.com/arweave/bundles/web.bundle.min.js"></script>
     <script src="js/bundle.js"></script>
     <script>
         $(document).ready(() => {

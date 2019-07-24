@@ -69,7 +69,7 @@ nav {
       transform: translateX(-50%);
     }
 
-    @media #{$medium-and-down} {
+    /*@media #{$medium-and-down} {
       left: 50%;
       transform: translateX(-50%);
 
@@ -83,7 +83,7 @@ nav {
         right: 0.5rem;
         left: auto;
       }
-    }
+    }*/
 
     &.right {
       right: 0.5rem;

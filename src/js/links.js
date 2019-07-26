@@ -235,6 +235,7 @@ class Links {
     }
 
     async getAll() {
+        // console.time('getAll');
         const queryLinks = {
             op: 'and',
             expr1: {
@@ -306,6 +307,7 @@ class Links {
             this._dataById = await this._workers.createDataById(this._data);
         }
 
+        // console.timeEnd('getAll');
         return this._data;
     }
 

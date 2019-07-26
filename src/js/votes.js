@@ -1,10 +1,11 @@
 class Votes {
     constructor() {
         this._votes = [];
+        this._votesByLinkId = new Map();
 
         this._workers = operative({
             getVotes: function(votes) {
-                let newVotes = [];
+                const newVotes = [];
                 for(let i = 0, j = votes.length; i < j; i++) {
                     const vote = votes[i];
 
@@ -22,10 +23,6 @@ class Votes {
                 }
 
                 this.deferred().fulfill(newVotes);
-            },
-            getVotesByLinkId: function(d) {
-                let vote = d.votes.find(v => v['link-id'] === d.linkId);
-                this.deferred().fulfill(vote? vote.votes : []);
             }
         });
     }
@@ -78,12 +75,17 @@ class Votes {
         }
 
         this._votes = await this._workers.getVotes(votes);
+        for(let i = 0, j = this._votes.length; i < j; i++) {
+            this._votesByLinkId.set(this._votes[i]['link-id'], this._votes[i].votes);
+        }
 
         return this._votes;
     }
 
     async getVotesByLinkId(linkId) {
-        return await this._workers.getVotesByLinkId({votes: this._votes, linkId});
+        const vote = this._votesByLinkId.get(linkId) || [];
+
+        return vote;
     }
 
     async publish(linkId) {

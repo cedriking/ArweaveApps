@@ -295,7 +295,7 @@ class Links {
             for(let i = 0, j = this._data.length; i < j; i++) {
                 if(!tmpSet.has(`${this._data[i].title}-${this._data[i].from}`) && this._categories.has(this._data[i].category)) {
                     this._data[i].votes = await votes.getVotesByLinkId(this._data[i].id);
-                    this._data[i].fromUser = await accounts.getUsername(this._data[i].from);
+                    this._data[i].fromUser = this._data[i].from; //await accounts.getUsername(this._data[i].from);
 
                     tmp.push(this._data[i]);
                     tmpSet.add(`${this._data[i].title}-${this._data[i].from}`);

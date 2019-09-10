@@ -351,7 +351,7 @@ class Links {
         const linksId = await this.getAllLinksByAccount(address);
 
         let options = [];
-        if(linksId && linksId.length) {
+        /*if(linksId && linksId.length) {
             options = await Promise.all(linksId.map(async linkId => {
                 let txRow = {};
                 const tx = await arweave.transactions.get(linkId);
@@ -372,9 +372,13 @@ class Links {
             }));
         }
 
-        const optionsHtml = await this._workers.getUserPermawebs(options);
+        const optionsHtml = await this._workers.getUserPermawebs(options);*/
 
-        $('#link-link').html(optionsHtml);
+        for(let i = 0, j = linksId.length; i < j; i++) {
+            options.push(`<option>${linksId[i]}</option>`);
+        }
+
+        $('#link-link').html(options);
         $('select').formSelect();
     }
 

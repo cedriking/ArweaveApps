@@ -1,17 +1,25 @@
 {
   "name": "arweaveapps",
-  "version": "0.1.4",
+  "version": "2.0.0",
   "private": true,
-  "devDependencies": {
-    "gulp": "4.0.2",
-    "gulp-autoprefixer": "6.1.0",
-    "gulp-concat": "2.6.1",
-    "gulp-rename": "1.4.0",
-    "gulp-sass": "4.0.2"
+  "scripts": {
+    "dev": "parcel src/index.pug",
+    "build": "parcel build src/index.pug"
   },
-  "description": "ArweaveApps is a directory for all the Arweave apps available out there, add yours now.",
-  "main": "index.js",
+  "devDependencies": {
+    "@types/node": "^12.11.1",
+    "parcel-bundler": "^1.12.4",
+    "pug": "^2.0.4",
+    "sass": "^1.23.0",
+    "typescript": "^3.6.4"
+  },
+  "description": "ArweaveApps is a directory for all the Arweave dApps available out there, add yours now.",
   "author": "GoldZeus",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "arweave": "^1.4.1",
+    "greenlet": "^1.1.0",
+    "threads": "^1.0.0-beta.6",
+    "umbrellajs": "^3.1.0"
+  }
 }

@@ -1,0 +1,3 @@
+class Accounts {
+  constructor() {}
+}

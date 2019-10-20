@@ -62,14 +62,14 @@ nav {
     color: $navbar-font-color;
     display: inline-block;
     font-size: $navbar-brand-font-size;
-    padding: 0 0 0 10px;
+    padding: 0;
 
     &.center {
       left: 50%;
       transform: translateX(-50%);
     }
 
-    /*@media #{$medium-and-down} {
+    @media #{$medium-and-down} {
       left: 50%;
       transform: translateX(-50%);
 
@@ -83,7 +83,7 @@ nav {
         right: 0.5rem;
         left: auto;
       }
-    }*/
+    }
 
     &.right {
       right: 0.5rem;

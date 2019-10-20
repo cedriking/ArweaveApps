@@ -1,0 +1,71 @@
+@import "materialize"
+
+.nav-wrapper
+  background-image: linear-gradient(to right, #6a11cb 0%, #2575fc 100%)
+
+strong
+  font-weight: bold
+
+#link-icon
+  width: 82px
+  height: 82px
+  border: 1px dashed black
+  display: block
+
+.file-input
+  height: 200px
+  border: 2px dashed #62666f
+  text-align: center
+  display: flex
+  align-items: center
+  justify-content: center
+  position: relative
+  margin: auto
+  max-width: 300px
+
+  input[type=file]
+    opacity: 0
+    position: absolute
+    background: none
+    width: 100%
+    height: 100%
+
+.account-box
+  @extend .z-depth-1
+  padding: 20px
+
+.link-category
+  .title
+    color: black
+    display: block
+
+  small
+    color: black
+
+  .link-item
+    border: 1px solid lightgrey
+    border-radius: 3px
+
+    &.avatar
+      img
+        width: 42px
+        height: 42px
+        float: left
+        margin-right: 15px
+        vertical-align: middle
+
+  .secondary-content
+    font-size: 75%
+    top: 0 !important
+
+    a
+      display: block
+      cursor: pointer
+
+footer
+  border-top: 1px solid
+  padding: 20px
+  font-weight: bold
+
+  img
+    vertical-align: middle

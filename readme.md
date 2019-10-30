@@ -8,10 +8,6 @@ The main purpose of the site is to work as an indexer for the Arweave permaweb.
 
 ### ChangeLog
 ```
-v0.1.4 (https://arweave.net/M7K44qPmrtBwFOLMmofHQCfBC3D0pi3ux0iy5T6Rhk4)
-- Temporary removed the use of ArweaveID to increase loading speed.
-- Increased timeout for Arweave requests
-
 v0.1.3 (https://arweave.net/fT3yafT-jSp4nOc_SfuUz5JhAD2OGkxQo8g9VX-azeM)
 - Updated the design
 

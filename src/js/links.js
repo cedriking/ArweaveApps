@@ -235,28 +235,25 @@ class Links {
     }
 
     async getAll() {
-        // console.time('getAll');
-        const queryLinks = {
-            op: 'and',
-            expr1: {
-                op: 'equals',
-                expr1: 'App-Name',
-                expr2: app.appName
-            },
-            expr2: {
-                op: 'equals',
-                expr1: 'Type',
-                expr2: 'publish'
+        const query = {
+            query: `{
+            transactions(tags: [{name: "App-Name", value: "arweaveapps"}, {name: "Type", value: "publish"}]) {
+              id,
+                votes: linkedFromTransactions(byForeignTag: "Link-Id", tags: [{name: "App-Name", value: "arweaveapps"}, {name: "Type", value: "vote"}]) {
+                id
+              }
             }
+          }`
         };
 
         console.log('fetching published apps...');
-        const res = await arweave.api.post(`arql`, queryLinks);
+        const res = await arweave.api.post(`arql`, query);
         console.log('finished fetching published apps.');
 
         this._data = [];
-        if(res.data.length) {
-            this._data = await Promise.all(res.data.map(async function(id) {
+        if(res.data.data.transactions.length) {
+            this._data = await Promise.all(res.data.data.transactions.map(async function(txs) {
+                const id = txs.id;
                 if(window.localStorage.getItem(id)) {
                     return JSON.parse(window.localStorage.getItem(id));
                 }
@@ -280,6 +277,12 @@ class Links {
                 txRow['linkId'] = data.linkId;
                 txRow['description'] = data.description;
 
+                const tmpVotes = new Set();
+                for(let i = 0, j = txs.votes.length; i < j; i++) {
+                    tmpVotes.add(txs.votes[i]);
+                }
+                txRow['votes'] = Array.from(tmpVotes);
+
                 window.localStorage.setItem(id, JSON.stringify(txRow));
                 return txRow;
             }));
@@ -290,15 +293,14 @@ class Links {
             // Remove duplicates (older versions), sort by time
             this._data = await this._workers.sortByDate(this._data);
 
+            // Remove old versions of a project and only work with the latest versions
             const tmp = [];
             const tmpSet = new Set();
             for(let i = 0, j = this._data.length; i < j; i++) {
-                if(!tmpSet.has(`${this._data[i].title}-${this._data[i].from}`) && this._categories.has(this._data[i].category)) {
-                    this._data[i].votes = await votes.getVotesByLinkId(this._data[i].id);
-                    this._data[i].fromUser = this._data[i].from; //await accounts.getUsername(this._data[i].from);
-
+                if(!tmpSet.has(`${this._data[i].title.toLowerCase()}-${this._data[i].from}`) && this._categories.has(this._data[i].category)) {
+                    this._data[i].fromUser = this._data[i].from;
                     tmp.push(this._data[i]);
-                    tmpSet.add(`${this._data[i].title}-${this._data[i].from}`);
+                    tmpSet.add(`${this._data[i].title.toLowerCase()}-${this._data[i].from}`);
                 }
             }
 
@@ -307,7 +309,6 @@ class Links {
             this._dataById = await this._workers.createDataById(this._data);
         }
 
-        // console.timeEnd('getAll');
         return this._data;
     }
 
@@ -331,7 +332,7 @@ class Links {
     }
 
     async showAll() {
-        await votes.getAllVotes();
+        //await votes.getAllVotes();
         await this.getAll();
 
         const html = await this._workers.convertAllToHtml({dataById: this._dataById, categories: Links.CATEGORIES()});

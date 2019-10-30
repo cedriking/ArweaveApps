@@ -39,9 +39,6 @@ class Links {
             sortByVotes: function(data) {
                 this.deferred().fulfill(data.sort((a, b) => a.votes.length < b.votes.length? 1 : a.votes.length > b.votes.length? -1 : 0));
             },
-            sortByDate: function(data) {
-                this.deferred().fulfill(data.sort((a, b) => +b['unix-time'] - +a['unix-time']));
-            },
             createDataById: function(data) {
                 const dataById = new Map();
                 for(let i = 0, j = data.length; i < j; i++) {
@@ -290,9 +287,6 @@ class Links {
 
         this._dataById = new Map();
         if(this._data.length) {
-            // Remove duplicates (older versions), sort by time
-            this._data = await this._workers.sortByDate(this._data);
-
             // Remove old versions of a project and only work with the latest versions
             const tmp = [];
             const tmpSet = new Set();

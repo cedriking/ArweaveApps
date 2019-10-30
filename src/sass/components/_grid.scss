@@ -10,7 +10,12 @@
 }
 @media #{$large-and-up} {
   .container {
-    width: 70%;
+    width: 80%;
+  }
+}
+@media #{$extra-large-and-up} {
+  .container {
+    width: 75%;
   }
 }
 .col .row {

@@ -1,0 +1,127 @@
+@charset "UTF-8";
+
+// Color
+@import "components/color-variables";
+@import "components/color-classes";
+
+// Variables;
+@import "components/variables";
+
+// Reset
+@import "components/normalize";
+
+// components
+@import "components/global";
+//@import "components/badges";
+@import "components/icons-material-design";
+@import "components/grid";
+@import "components/navbar";
+@import "components/typography";
+@import "components/transitions";
+@import "components/cards";
+@import "components/toast";
+//@import "components/tabs";
+//@import "components/tooltip";
+@import "components/buttons";
+@import "components/dropdown";
+@import "components/waves";
+@import "components/modal";
+//@import "components/collapsible";
+//@import "components/chips";
+@import "components/materialbox";
+@import "components/forms/forms";
+//@import "components/table_of_contents";
+@import "components/sidenav";
+@import "components/preloader";
+@import "components/slider";
+@import "components/carousel";
+@import "components/tapTarget";
+@import "components/pulse";
+//@import "components/datepicker";
+//@import "components/timepicker";
+//@import "components/search";
+
+strong {
+  font-weight: bold;
+}
+.apage {
+  display: none;
+}
+
+#link-icon {
+  width: 82px;
+  height: 82px;
+  border: 1px dashed black;
+  display: block;
+}
+
+.file-input {
+  height: 200px;
+  border: 2px dashed #62666f;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: auto;
+  max-width: 300px;
+
+  input[type=file] {
+    opacity: 0;
+    position: absolute;
+    background: none;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.account-box {
+  @extend .z-depth-1;
+  padding: 20px;
+}
+
+.collection {
+  .title {
+    color: black;
+    display: block;
+  }
+  small {
+    color: black;
+  }
+
+  .collection-item {
+    padding: 10px 40px;
+
+    &.avatar {
+      img {
+        position: absolute;
+        width: 42px;
+        height: 42px;
+        overflow: hidden;
+        left: 15px;
+        display: inline-block;
+        vertical-align: middle;
+      }
+    }
+  }
+
+  .secondary-content {
+    font-size: 75%;
+    top: 0 !important;
+
+    a {
+      display: block;
+      cursor: pointer;
+    }
+  }
+}
+
+footer {
+  border-top: 1px solid;
+  padding: 20px;
+  font-weight: bold;
+
+  img {
+    vertical-align: middle;
+  }
+}

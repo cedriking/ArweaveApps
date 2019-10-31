@@ -312,9 +312,17 @@ class Links {
                 expr2: address
             },
             expr2: {
-                op: 'equals',
-                expr1: 'Content-Type',
-                expr2: 'text/html'
+                op: 'or',
+                expr1: {
+                    op: 'equals',
+                    expr1: 'Content-Type',
+                    expr2: 'text/html'
+                },
+                expr2: {
+                    op: 'equals',
+                    expr1: 'Content-Type',
+                    expr2: 'application/x.arweave-manifest+json'
+                }
             }
         };
         const res = await arweave.api.post('arql', query);

@@ -248,41 +248,38 @@ class Links {
         console.log('finished fetching published apps.');
 
         this._data = [];
-        if(res.data.data.transactions.length) {
-            this._data = await Promise.all(res.data.data.transactions.map(async function(txs) {
-                const id = txs.id;
-                if(window.localStorage.getItem(id)) {
-                    return JSON.parse(window.localStorage.getItem(id));
-                }
+        const transactions = res.data.data.transactions;
 
-                let txRow = {};
-                var tx = await arweave.transactions.get(id);
+        for(let i = 0, j = transactions.length; i < j; i++) {
+            const id = transactions[i].id;
 
-                tx.get('tags').forEach(tag => {
-                    let key = tag.get('name', { decode: true, string: true });
-                    let value = tag.get('value', { decode: true, string: true });
-                    txRow[key.toLowerCase()] = value
-                });
+            let txRow = {};
+            const tx = await arweave.transactions.get(id);
 
-                const jsonData = tx.get('data', {decode: true, string: true});
-                const data = JSON.parse(jsonData);
+            tx.get('tags').forEach(tag => {
+                let key = tag.get('name', { decode: true, string: true });
+                let value = tag.get('value', { decode: true, string: true });
+                txRow[key.toLowerCase()] = value
+            });
 
-                txRow['id'] = id;
-                txRow['appIcon'] = data.appIcon;
-                txRow['from'] = await arweave.wallets.ownerToAddress(tx.owner);
-                txRow['title'] = data.title;
-                txRow['linkId'] = data.linkId;
-                txRow['description'] = data.description;
+            const jsonData = tx.get('data', {decode: true, string: true});
+            const data = JSON.parse(jsonData);
 
-                const tmpVotes = new Set();
-                for(let i = 0, j = txs.votes.length; i < j; i++) {
-                    tmpVotes.add(txs.votes[i]);
-                }
-                txRow['votes'] = Array.from(tmpVotes);
+            txRow['title'] = data.title;
+            txRow['id'] = id;
+            txRow['appIcon'] = data.appIcon;
+            txRow['from'] = await arweave.wallets.ownerToAddress(tx.owner);
+            txRow['linkId'] = data.linkId;
+            txRow['description'] = data.description;
 
-                window.localStorage.setItem(id, JSON.stringify(txRow));
-                return txRow;
-            }));
+            const tmpVotes = new Set();
+            for(let i = 0, j = transactions[i].votes.length; i < j; i++) {
+                tmpVotes.add(transactions[i].votes[i]);
+            }
+            txRow['votes'] = Array.from(tmpVotes);
+
+            this._data.push(txRow);
+            window.localStorage.setItem(id, JSON.stringify(txRow));
         }
 
         this._dataById = new Map();

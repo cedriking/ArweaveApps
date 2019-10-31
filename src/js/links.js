@@ -243,27 +243,28 @@ class Links {
           }`
         };
 
-        console.log('fetching published apps...');
+        console.time('fetching apps');
         const res = await arweave.api.post(`arql`, query);
-        console.log('finished fetching published apps.');
+        console.timeEnd('fetching apps');
 
         this._data = [];
         const transactions = res.data.data.transactions;
 
+        const appUser = new Set();
+
+        console.time('grabbing app details');
         for(let i = 0, j = transactions.length; i < j; i++) {
             const id = transactions[i].id;
 
             let txRow = {};
             const tx = await arweave.transactions.get(id);
 
-            tx.get('tags').forEach(tag => {
-                let key = tag.get('name', { decode: true, string: true });
-                let value = tag.get('value', { decode: true, string: true });
-                txRow[key.toLowerCase()] = value
-            });
-
             const jsonData = tx.get('data', {decode: true, string: true});
             const data = JSON.parse(jsonData);
+
+            // if(appUser.has(`${data.title.toLowerCase()}-${tx.owner}`)) {
+            //     continue;
+            // }
 
             txRow['title'] = data.title;
             txRow['id'] = id;
@@ -271,6 +272,12 @@ class Links {
             txRow['from'] = await arweave.wallets.ownerToAddress(tx.owner);
             txRow['linkId'] = data.linkId;
             txRow['description'] = data.description;
+
+            tx.get('tags').forEach(tag => {
+                let key = tag.get('name', { decode: true, string: true });
+                let value = tag.get('value', { decode: true, string: true });
+                txRow[key.toLowerCase()] = value
+            });
 
             const tmpVotes = new Set();
             for(let i = 0, j = transactions[i].votes.length; i < j; i++) {
@@ -281,8 +288,10 @@ class Links {
             this._data.push(txRow);
             window.localStorage.setItem(id, JSON.stringify(txRow));
         }
+        console.timeEnd('grabbing app details');
 
         this._dataById = new Map();
+        console.time('filtering apps');
         if(this._data.length) {
             // Remove old versions of a project and only work with the latest versions
             const tmp = [];
@@ -299,6 +308,7 @@ class Links {
             this._data = await this._workers.sortByVotes(tmp);
             this._dataById = await this._workers.createDataById(this._data);
         }
+        console.timeEnd('filtering apps');
 
         return this._data;
     }
@@ -325,25 +335,33 @@ class Links {
                 }
             }
         };
+
+        console.time('grabbing user apps');
         const res = await arweave.api.post('arql', query);
+        console.timeEnd('grabbing user apps');
 
         return res.data;
     }
 
     async showAll() {
         //await votes.getAllVotes();
+        console.time('getAll');
         await this.getAll();
+        console.timeEnd('getAll');
 
+        console.time('grabbing html');
         const html = await this._workers.convertAllToHtml({dataById: this._dataById, categories: Links.CATEGORIES()});
+        console.timeEnd('grabbing html');
         $('.js-app-list').html(html);
 
+        console.time('filling images');
         $('.empty-img').each((i, e) => {
             const hash = $(e).parents('.collection-item').first().data('linkid');
             const icon = hashicon(hash, 42);
 
             $(e).attr('src', icon.toDataURL("image/png"));
         });
-
+        console.timeEnd('filling images');
         this._contentLoaded = true;
     }
 

@@ -250,8 +250,6 @@ class Links {
         this._data = [];
         const transactions = res.data.data.transactions;
 
-        const appUser = new Set();
-
         console.time('grabbing app details');
         for(let i = 0, j = transactions.length; i < j; i++) {
             const id = transactions[i].id;
@@ -261,10 +259,6 @@ class Links {
 
             const jsonData = tx.get('data', {decode: true, string: true});
             const data = JSON.parse(jsonData);
-
-            // if(appUser.has(`${data.title.toLowerCase()}-${tx.owner}`)) {
-            //     continue;
-            // }
 
             txRow['title'] = data.title;
             txRow['id'] = id;

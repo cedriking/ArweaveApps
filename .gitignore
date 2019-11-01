@@ -95,6 +95,5 @@ arweave-keyfile.json
 ArweaveApps.iml
 
 # Dist files
-public/css/
-public/js/
+public
 dist

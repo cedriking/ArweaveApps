@@ -8,6 +8,11 @@ The main purpose of the site is to work as an indexer for the Arweave permaweb.
 
 ### ChangeLog
 ```
+v0.1.5 (https://flxmwbspwsiz.arweave.net/exGhKyGnYFcYWRH0EyGhYn-QG-_L9TzeqlrLA-lK9Nc/index.html)
+- Using path manifest
+- Updated one line to GraphQL
+- Allowing apps that are deployed with path manifest to be added on ArweaveApps
+
 v0.1.4 (https://arweave.net/M7K44qPmrtBwFOLMmofHQCfBC3D0pi3ux0iy5T6Rhk4)
 - Temporary removed the use of ArweaveID to increase loading speed.
 - Increased timeout for Arweave requests

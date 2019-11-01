@@ -1,6 +1,6 @@
 {
   "name": "arweaveapps",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "devDependencies": {
     "gulp": "4.0.2",

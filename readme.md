@@ -8,7 +8,7 @@ The main purpose of the site is to work as an indexer for the Arweave permaweb.
 
 ### ChangeLog
 ```
-v0.1.5 (https://flxmwbspwsiz.arweave.net/exGhKyGnYFcYWRH0EyGhYn-QG-_L9TzeqlrLA-lK9Nc/index.html)
+v0.1.5 (https://5nxrbkulhlk5.arweave.net/SxP07l_m3wDJKTYGapy7w-i_vaBjhkKgnFpln5gYn64/index.html)
 - Using path manifest
 - Updated one line to GraphQL
 - Allowing apps that are deployed with path manifest to be added on ArweaveApps

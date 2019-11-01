@@ -254,6 +254,12 @@ class Links {
         for(let i = 0, j = transactions.length; i < j; i++) {
             const id = transactions[i].id;
 
+            let storedData = window.localStorage.getItem(`${app.appVersion}-${id}`);
+            if(storedData) {
+                this._data.push(JSON.parse(storedData));
+                continue;
+            }
+
             let txRow = {};
             const tx = await arweave.transactions.get(id);
 
@@ -274,15 +280,20 @@ class Links {
             });
 
             const tmpVotes = new Set();
-            for(let i = 0, j = transactions[i].votes.length; i < j; i++) {
-                tmpVotes.add(transactions[i].votes[i]);
+            for(let k = 0, l = transactions[i].votes.length; k < l; k++) {
+                tmpVotes.add(transactions[i].votes[k].id);
             }
             txRow['votes'] = Array.from(tmpVotes);
 
             this._data.push(txRow);
-            window.localStorage.setItem(id, JSON.stringify(txRow));
+
+            try {
+                window.localStorage.setItem(`${app.appVersion}-${id}`, JSON.stringify(txRow));
+            } catch (e) {}
+
         }
         console.timeEnd('grabbing app details');
+        console.log(this._data);
 
         this._dataById = new Map();
         console.time('filtering apps');
@@ -363,28 +374,6 @@ class Links {
         const linksId = await this.getAllLinksByAccount(address);
 
         let options = [];
-        /*if(linksId && linksId.length) {
-            options = await Promise.all(linksId.map(async linkId => {
-                let txRow = {};
-                const tx = await arweave.transactions.get(linkId);
-
-                tx.get('tags').forEach(tag => {
-                    let key = tag.get('name', { decode: true, string: true });
-                    let value = tag.get('value', { decode: true, string: true });
-                    txRow[key.toLowerCase()] = value
-                });
-
-                const data = tx.get('data', {decode: true, string: true});
-
-                txRow['id'] = linkId;
-                txRow['data'] = data;
-                txRow['from'] = await arweave.wallets.ownerToAddress(tx.owner);
-
-                return txRow;
-            }));
-        }
-
-        const optionsHtml = await this._workers.getUserPermawebs(options);*/
 
         for(let i = 0, j = linksId.length; i < j; i++) {
             options.push(`<option>${linksId[i]}</option>`);

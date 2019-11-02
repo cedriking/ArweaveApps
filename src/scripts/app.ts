@@ -1,10 +1,16 @@
-const arweave = Arweave.init({host: 'arweave.net', port: 443, protocol: 'https', timeout: 60000});
+import $ from 'cash-dom';
+import Arweave from 'arweave/web';
+import {accounts} from "./accounts";
+import {links} from "./links";
+import {votes} from "./votes";
 
-class App {
+export const arweave = Arweave.init({});
+
+export class App {
+  static appName = 'arweaveapps';
+  static appVersion = '0.1.6';
+
   constructor() {
-    this._appName = 'arweaveapps';
-    this._appVersion = '0.1.1';
-
     window.onhashchange = () => this.hashChanged();
   }
 
@@ -25,13 +31,13 @@ class App {
 
       if(newPage === 'logout') {
         window.location.href = window.location.href.split('#')[0];
-      } else if(newPage === 'publish' && !accounts.loggedIn) {
+      } else if(newPage === 'publish' && !accounts.isLoggedIn) {
         page = 'home';
       } else if(newPage === 'home' || newPage === 'publish' || newPage === 'view') {
         page = newPage;
       } else if(newPage.indexOf('/') > 0) {
         const go = () => {
-          if(!links.contentLoaded) {
+          if(!links.isContentLoaded) {
             return setTimeout(() => go(), 100);
           }
 
@@ -54,15 +60,8 @@ class App {
   }
 
   _events() {
-    $('select').formSelect();
-  }
-
-  get appName() {
-    return this._appName;
-  }
-
-  get appVersion() {
-    return this._appVersion;
+    M.FormSelect.init(document.querySelectorAll('select'));
   }
 }
-const app = new App();
+export const app = new App();
+app.init();

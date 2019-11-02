@@ -10,6 +10,8 @@ class Accounts {
   private wallet;
   private walletUser;
 
+  private mLoginModal;
+
   public get isLoggedIn(): boolean {
     return this.loggedIn;
   }
@@ -74,8 +76,7 @@ class Accounts {
 
   showLogin() {
     this.loginOpen = true;
-    // @ts-ignore
-    $('#modal-login').modal('open');
+    this.mLoginModal.open();
   }
 
   private login(ev) {
@@ -93,8 +94,7 @@ class Accounts {
       $('.js-logged-in').removeClass('hide').children('strong').text(this.walletUser);
       $('.js-logged-out').addClass('hide');
 
-      // @ts-ignore
-      $('#modal-login').modal('close');
+      this.mLoginModal.close();
       app.hashChanged();
 
       links.showAllLinksByAccount(address).catch(console.log);
@@ -119,7 +119,7 @@ class Accounts {
       this.login(e);
     };
 
-    M.Modal.init($('#modal-login')[0], {
+    this.mLoginModal = M.Modal.init($('#modal-login')[0], {
       onCloseEnd: () => this.loginOpen = false
     });
 

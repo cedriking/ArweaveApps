@@ -212,16 +212,14 @@ export class Links {
   async showAllLinksByAccount(address) {
     const linksId = await this.getAllLinksByAccount(address);
 
-    let options = [];
+    let options: string[] = [];
 
     for(let i = 0, j = linksId.length; i < j; i++) {
       options.push(`<option>${linksId[i]}</option>`);
     }
 
-    // @ts-ignore
-    $('#link-link').html(options);
-    // @ts-ignore
-    $('select').formSelect();
+    $('#link-link').html(options.join());
+    M.FormSelect.init(document.querySelectorAll('select'));
   }
 
   async publish() {

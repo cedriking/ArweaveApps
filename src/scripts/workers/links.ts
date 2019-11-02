@@ -1,5 +1,6 @@
 import {expose} from 'threads';
 import {Utils} from "../utils";
+import axios from 'axios';
 
 const linksWorker = {
   sortByVotes: async data => {
@@ -69,6 +70,34 @@ const linksWorker = {
     });
 
     return html;
+  },
+  getTransactionDetailsById: async (txId: string, transaction) => {
+    let txRow = {};
+
+    const res = await axios(`https://arweave.net/tx/${txId}`);
+    const tx = res.data;
+
+    const data = JSON.parse(atob(tx.data));
+
+    txRow['title'] = data.title;
+    txRow['id'] = txId;
+    txRow['appIcon'] = data.appIcon;
+    txRow['from'] = tx.owner;
+    txRow['linkId'] = data.linkId;
+    txRow['description'] = data.description;
+
+    tx.tags.forEach(tag => {
+      const key = atob(tag.name);
+      txRow[key.toLowerCase()] = atob(tag.value);
+    });
+
+    const tmpVotes = new Set();
+    for(let k = 0, l = transaction.votes.length; k < l; k++) {
+      tmpVotes.add(transaction.votes[k].id);
+    }
+    txRow['votes'] = Array.from(tmpVotes);
+
+    return txRow;
   }
 };
 

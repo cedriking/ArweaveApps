@@ -7,6 +7,7 @@ import {Utils} from "./utils";
 import {Pool, spawn} from 'threads';
 import {LinksWorker} from "./workers/links";
 import "threads/register";
+import {worker} from "cluster";
 
 const pool = Pool(() => spawn<LinksWorker>(new Worker("./workers/links.ts")), 8 /* optional size */);
 
@@ -93,6 +94,7 @@ export class Links {
 
     this.data = [];
     const transactions = res.data.data.transactions;
+    let hasPool = false;
 
     console.time('grabbing app details');
     for(let i = 0, j = transactions.length; i < j; i++) {
@@ -104,38 +106,20 @@ export class Links {
         continue;
       }
 
-      let txRow = {};
-      const tx = await arweave.transactions.get(id);
+      hasPool = true;
+      pool.queue(async linksWorker => {
+        const txRow = await linksWorker.getTransactionDetailsById(id, transactions[i]);
+        txRow['from'] = await arweave.wallets.ownerToAddress(txRow.from);
+        this.data.push(txRow);
 
-      const jsonData = tx.get('data', {decode: true, string: true});
-      const data = JSON.parse(jsonData);
-
-      txRow['title'] = data.title;
-      txRow['id'] = id;
-      txRow['appIcon'] = data.appIcon;
-      txRow['from'] = await arweave.wallets.ownerToAddress(tx.owner);
-      txRow['linkId'] = data.linkId;
-      txRow['description'] = data.description;
-
-      // @ts-ignore
-      tx.get('tags').forEach(tag => {
-        let key = tag.get('name', { decode: true, string: true });
-        let value = tag.get('value', { decode: true, string: true });
-        txRow[key.toLowerCase()] = value
+        try {
+          window.localStorage.setItem(`${App.appVersion}-${id}`, JSON.stringify(txRow));
+        } catch (e) {}
       });
 
-      const tmpVotes = new Set();
-      for(let k = 0, l = transactions[i].votes.length; k < l; k++) {
-        tmpVotes.add(transactions[i].votes[k].id);
-      }
-      txRow['votes'] = Array.from(tmpVotes);
-
-      this.data.push(txRow);
-
-      try {
-        window.localStorage.setItem(`${App.appVersion}-${id}`, JSON.stringify(txRow));
-      } catch (e) {}
-
+    }
+    if(hasPool) {
+      await pool.completed();
     }
     console.timeEnd('grabbing app details');
 
@@ -146,12 +130,14 @@ export class Links {
       let tmp = [];
       const tmpSet = new Set();
       for(let i = 0, j = this.data.length; i < j; i++) {
+        console.log(`${this.data[i].title.toLowerCase()}-${this.data[i].from}`, this.data[i].category);
         if(!tmpSet.has(`${this.data[i].title.toLowerCase()}-${this.data[i].from}`) && this.categories.has(this.data[i].category)) {
           this.data[i].fromUser = this.data[i].from;
           tmp.push(this.data[i]);
           tmpSet.add(`${this.data[i].title.toLowerCase()}-${this.data[i].from}`);
         }
       }
+      console.log(tmp);
 
       // Sort by votes
       pool.queue(async linksWorker => {

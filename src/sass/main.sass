@@ -1,0 +1,84 @@
+@import "plugins/materialize"
+
+strong 
+  font-weight: bold
+
+.apage 
+  display: none
+
+
+#link-icon 
+  width: 82px
+  height: 82px
+  border: 1px dashed black
+  display: block
+
+
+.file-input 
+  height: 200px
+  border: 2px dashed #62666f
+  text-align: center
+  display: flex
+  align-items: center
+  justify-content: center
+  position: relative
+  margin: auto
+  max-width: 300px
+
+  input[type=file] 
+    opacity: 0
+    position: absolute
+    background: none
+    width: 100%
+    height: 100%
+
+
+
+.account-box 
+  @extend .z-depth-1
+  padding: 20px
+
+
+.collection 
+  .title 
+    color: black
+    display: block
+
+  small 
+    color: black
+
+
+  .collection-item 
+    padding: 10px 40px
+
+    &.avatar 
+      img 
+        position: absolute
+        width: 42px
+        height: 42px
+        overflow: hidden
+        left: 15px
+        display: inline-block
+        vertical-align: middle
+    
+  
+
+
+  .secondary-content 
+    font-size: 75%
+    top: 0 !important
+
+    a 
+      display: block
+      cursor: pointer
+  
+
+
+
+footer 
+  border-top: 1px solid
+  padding: 20px
+  font-weight: bold
+
+  img 
+    vertical-align: middle

@@ -138,13 +138,12 @@ export class Links {
 
     }
     console.timeEnd('grabbing app details');
-    console.log(this.data);
 
     this.dataById = new Map();
     console.time('filtering apps');
     if(this.data.length) {
       // Remove old versions of a project and only work with the latest versions
-      const tmp = [];
+      let tmp = [];
       const tmpSet = new Set();
       for(let i = 0, j = this.data.length; i < j; i++) {
         if(!tmpSet.has(`${this.data[i].title.toLowerCase()}-${this.data[i].from}`) && this.categories.has(this.data[i].category)) {
@@ -156,12 +155,12 @@ export class Links {
 
       // Sort by votes
       pool.queue(async linksWorker => {
-        await linksWorker.sortByVotes(tmp);
+        tmp = await linksWorker.sortByVotes(tmp);
       });
       await pool.completed();
 
       pool.queue(async linksWorker => {
-        await linksWorker.createDataById(this.data);
+        this.dataById = await linksWorker.createDataById(tmp);
       });
       await pool.completed();
     }

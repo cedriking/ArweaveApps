@@ -130,14 +130,12 @@ export class Links {
       let tmp = [];
       const tmpSet = new Set();
       for(let i = 0, j = this.data.length; i < j; i++) {
-        console.log(`${this.data[i].title.toLowerCase()}-${this.data[i].from}`, this.data[i].category);
         if(!tmpSet.has(`${this.data[i].title.toLowerCase()}-${this.data[i].from}`) && this.categories.has(this.data[i].category)) {
           this.data[i].fromUser = this.data[i].from;
           tmp.push(this.data[i]);
           tmpSet.add(`${this.data[i].title.toLowerCase()}-${this.data[i].from}`);
         }
       }
-      console.log(tmp);
 
       // Sort by votes
       pool.queue(async linksWorker => {

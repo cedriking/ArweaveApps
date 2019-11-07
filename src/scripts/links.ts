@@ -154,33 +154,28 @@ export class Links {
   }
 
   async getAllLinksByAccount(address) {
-    const query = {
-      op: 'and',
-      expr1: {
-        op: 'equals',
-        expr1: 'from',
-        expr2: address
-      },
-      expr2: {
-        op: 'or',
-        expr1: {
-          op: 'equals',
-          expr1: 'Content-Type',
-          expr2: 'text/html'
-        },
-        expr2: {
-          op: 'equals',
-          expr1: 'Content-Type',
-          expr2: 'application/x.arweave-manifest+json'
+    const queryHtml = {
+      query: `{
+        html: transactions(from: "BPr7vrFduuQqqVMu_tftxsScTKUq9ke0rx4q5C9ieQU", tags: [{name: "Content-Type", value: "text/html"}]) {
+          id
         }
-      }
+      }`
+    };
+
+    const queryManifest = {
+      query: `{
+        manifest: transactions(from: "BPr7vrFduuQqqVMu_tftxsScTKUq9ke0rx4q5C9ieQU", tags: [{name: "Content-Type", value: "application/x.arweave-manifest+json"}]) {
+          id
+        }
+      }`
     };
 
     console.time('grabbing user apps');
-    const res = await arweave.api.post('arql', query);
+    const res = await arweave.api.post('arql', queryManifest);
+    const r = await arweave.api.post('arql', queryHtml);
     console.timeEnd('grabbing user apps');
 
-    return res.data;
+    return r.data.data.html.concat(res.data.data.manifest).map(a => a.id);
   }
 
   async showAll() {

@@ -1,12 +1,12 @@
 {
   "name": "arweaveapps",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "private": true,
   "description": "ArweaveApps is a directory for all the Arweave apps available out there, add yours now.",
   "main": "index.js",
   "scripts": {
     "start": "parcel src/index.pug",
-    "build": "parcel build src/index.pug"
+    "build": "rimraf dist && parcel build src/index.pug --public-url ./ --no-source-maps"
   },
   "author": "GoldZeus",
   "license": "MIT",
@@ -16,13 +16,13 @@
     "cash-dom": "^4.1.5",
     "hashicon": "^0.3.0",
     "materialize-css": "^1.0.0",
-    "plugins": "^0.4.2",
     "threads": "^1.0.0-beta.6"
   },
   "devDependencies": {
     "@types/node": "^12.12.5",
     "parcel-bundler": "^1.12.4",
     "pug": "^2.0.4",
+    "rimraf": "^3.0.0",
     "sass": "^1.23.3",
     "typescript": "^3.6.4"
   }

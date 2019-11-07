@@ -8,6 +8,13 @@ The main purpose of the site is to work as an indexer for the Arweave permaweb.
 
 ### ChangeLog
 ```
+v0.2.0 (https://arweave.net/FxO4pz5vxndEXdoE1i_iS9pLnz80tBWLntqGeCTrhnY)
+- Replaced Gulp for ParcelJS. A lot easier and faster to work on newer versions
+- Converting all src JS files to typescript and SCSS files to SASS
+- Replaced index.html to use Pug and now available over the src dir
+- Using GraphQL for most requests instead of ArQL, reducing request time from ~6secs to ~3secs
+- Reduced transaction details load time from ~20 seconds to ~5 seconds using request pools
+
 v0.1.5 (https://5nxrbkulhlk5.arweave.net/SxP07l_m3wDJKTYGapy7w-i_vaBjhkKgnFpln5gYn64/index.html)
 - Using path manifest
 - Updated one line to GraphQL

@@ -4,12 +4,10 @@ import hashicon from 'hashicon';
 import {App, arweave} from "./app";
 import {accounts} from "./accounts";
 import {Utils} from "./utils";
-import {Pool, spawn} from 'threads';
-import {LinksWorker} from "./workers/links";
-import "threads/register";
-import {worker} from "cluster";
+import {LinksModel} from "./models/mLinks";
+import {ILink} from "./interfaces/iLink";
 
-const pool = Pool(() => spawn<LinksWorker>(new Worker("./workers/links.ts")), 8 /* optional size */);
+const linksModel = new LinksModel();
 
 export class Links {
   static CATEGORIES() {
@@ -32,11 +30,11 @@ export class Links {
     ];
   }
 
-  private data = [];
-  private dataById = new Map();
-  private appIcon = '';
-  private contentLoaded = false;
-  private categories = new Set();
+  private data: ILink[] = [];
+  private dataById: Map<string, ILink> = new Map();
+  private appIcon: string = '';
+  private contentLoaded: boolean = false;
+  private categories: Set<string> = new Set();
 
   public get getDataById() {
     return this.dataById;
@@ -94,33 +92,10 @@ export class Links {
 
     this.data = [];
     const transactions = res.data.data.transactions;
-    let hasPool = false;
 
     console.time('grabbing app details');
-    for(let i = 0, j = transactions.length; i < j; i++) {
-      const id = transactions[i].id;
-
-      let storedData = window.localStorage.getItem(`${App.appVersion}-${id}`);
-      if(storedData) {
-        this.data.push(JSON.parse(storedData));
-        continue;
-      }
-
-      hasPool = true;
-      pool.queue(async linksWorker => {
-        const txRow = await linksWorker.getTransactionDetailsById(id, transactions[i]);
-        txRow['from'] = await arweave.wallets.ownerToAddress(txRow.from);
-        this.data.push(txRow);
-
-        try {
-          window.localStorage.setItem(`${App.appVersion}-${id}`, JSON.stringify(txRow));
-        } catch (e) {}
-      });
-
-    }
-    if(hasPool) {
-      await pool.completed();
-    }
+    // @ts-ignore
+    this.data = await linksModel.getTransactionDetails(transactions);
     console.timeEnd('grabbing app details');
 
     this.dataById = new Map();
@@ -131,22 +106,15 @@ export class Links {
       const tmpSet = new Set();
       for(let i = 0, j = this.data.length; i < j; i++) {
         if(!tmpSet.has(`${this.data[i].title.toLowerCase()}-${this.data[i].from}`) && this.categories.has(this.data[i].category)) {
-          this.data[i].fromUser = this.data[i].from;
           tmp.push(this.data[i]);
           tmpSet.add(`${this.data[i].title.toLowerCase()}-${this.data[i].from}`);
         }
       }
 
       // Sort by votes
-      pool.queue(async linksWorker => {
-        tmp = await linksWorker.sortByVotes(tmp);
-      });
-      await pool.completed();
+      tmp = await linksModel.sortByVotes(tmp);
 
-      pool.queue(async linksWorker => {
-        this.dataById = await linksWorker.createDataById(tmp);
-      });
-      await pool.completed();
+      this.dataById = await linksModel.createDataById(tmp);
     }
     console.timeEnd('filtering apps');
 
@@ -185,11 +153,7 @@ export class Links {
     console.timeEnd('getAll');
 
     console.time('grabbing html');
-    let html = '';
-    pool.queue(async linksWorker => {
-      html = await linksWorker.convertAllToHtml({dataById: this.dataById, categories: Links.CATEGORIES()});
-    });
-    await pool.completed();
+    let html = await linksModel.convertAllToHtml({dataById: this.dataById, categories: Links.CATEGORIES()});
     console.timeEnd('grabbing html');
     $('.js-app-list').html(html);
 

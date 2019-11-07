@@ -8,7 +8,7 @@ The main purpose of the site is to work as an indexer for the Arweave permaweb.
 
 ### ChangeLog
 ```
-v0.2.0 (https://arweave.net/FxO4pz5vxndEXdoE1i_iS9pLnz80tBWLntqGeCTrhnY)
+v0.2.0 (https://arweave.net/6sbzSXo0kjr8V0xjwRfyJ7JifQLqM3Zf1I0j6L_t_Xg)
 - Replaced Gulp for ParcelJS. A lot easier and faster to work on newer versions
 - Converting all src JS files to typescript and SCSS files to SASS
 - Replaced index.html to use Pug and now available over the src dir

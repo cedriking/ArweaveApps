@@ -136,17 +136,17 @@ export class LinksModel {
 
     const data = JSON.parse(atob(tx.data));
 
-    txRow['title'] = data.title;
+    txRow['title'] = Utils.stripTags(data.title);
     txRow['id'] = txId;
-    txRow['appIcon'] = data.appIcon;
+    txRow['appIcon'] = data.appIcon? Utils.stripTags(data.appIcon) : null;
     txRow['from'] = await arweave.wallets.ownerToAddress(tx.owner);
     txRow['fromUser'] = txRow['from'];
-    txRow['linkId'] = data.linkId;
-    txRow['description'] = data.description;
+    txRow['linkId'] = data.linkId? Utils.stripTags(data.linkId) : null;
+    txRow['description'] = Utils.stripTags(data.description);
 
     tx.tags.forEach(tag => {
-      const key = atob(tag.name);
-      txRow[key.toLowerCase().replace(/-([a-z])/g, (g) => g[1].toUpperCase())] = atob(tag.value);
+      const key = Utils.stripTags(atob(tag.name));
+      txRow[key.toLowerCase().replace(/-([a-z])/g, (g) => g[1].toUpperCase())] = Utils.stripTags(atob(tag.value));
     });
 
     const tmpVotes: Set<string> = new Set();

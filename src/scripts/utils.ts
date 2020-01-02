@@ -21,6 +21,10 @@ export class Utils {
     return str;
   }
 
+  static stripTags(str: string): string {
+    return str.replace(/(&\w+;|<([^>]+)>)/gi, '');
+  }
+
   static gradients = [
     'background: #9D7AF7;\n' +
     'background: -webkit-linear-gradient(right, #9D7AF7, #1192B1);\n' +

@@ -182,10 +182,10 @@ export class Links {
     }
 
     // Validate that all the fields are valid and filled
-    const title = this._htmlToTxt($('#link-title').val());
-    const category = this._htmlToTxt($('#link-category').val()).toLowerCase();
-    const linkId = this._htmlToTxt($('#link-link').val());
-    const description = this._htmlToTxt($('#link-description').val());
+    const title = Utils.stripTags($('#link-title').val().toString());
+    const category = Utils.stripTags($('#link-category').val().toString()).toLowerCase();
+    const linkId = Utils.stripTags($('#link-link').val().toString());
+    const description = Utils.stripTags($('#link-description').val().toString());
 
     if(title.length < 3 || title.length > 25) {
       return M.toast({html: 'The app title must be between 3 and 25 characters.'});
@@ -258,10 +258,6 @@ export class Links {
     // @ts-ignore
     $('#link-category').html(optionsHtml);
     M.FormSelect.init(document.querySelectorAll('select'));
-  }
-
-  _htmlToTxt(str) {
-    return $(`<div>${str}</div>`).text();
   }
 
   _events() {

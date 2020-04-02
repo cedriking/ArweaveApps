@@ -75,23 +75,20 @@ export class Links {
   }
 
   async getAll() {
-    const query = {
-      query: `{
-            transactions(tags: [{name: "App-Name", value: "arweaveapps"}, {name: "Type", value: "publish"}]) {
-              id,
-                votes: linkedFromTransactions(byForeignTag: "Link-Id", tags: [{name: "App-Name", value: "arweaveapps"}, {name: "Type", value: "vote"}]) {
-                id
-              }
-            }
-          }`
-    };
+    const transactions: string[] = await arweave.arql({
+      op: 'and',
+      expr1: {
+        op: 'equals',
+        expr1: 'App-Name',
+        expr2: App.appName
+      },
+      expr2: {
+        op: 'equals',
+        expr1: 'Type',
+        expr2: 'publish'
+      }
+    });
 
-    console.time('fetching apps');
-    const res = await arweave.api.post(`arql`, query);
-    console.timeEnd('fetching apps');
-
-    this.data = [];
-    const transactions = res.data.data.transactions;
 
     console.time('grabbing app details');
     // @ts-ignore
@@ -121,25 +118,6 @@ export class Links {
     return this.data;
   }
 
-  async getAllLinksByAccount(address) {
-    const query = {
-      query: `{
-        html: transactions(from: "${address}", tags: [{name: "Content-Type", value: "text/html"}]) {
-          id
-        }
-        manifest: transactions(from: "${address}", tags: [{name: "Content-Type", value: "application/x.arweave-manifest+json"}]) {
-          id
-        }
-      }`
-    };
-
-    console.time('grabbing user apps');
-    const res = await arweave.api.post('arql', query);
-    console.timeEnd('grabbing user apps');
-
-    return res.data.data.html.concat(res.data.data.manifest).map(a => a.id);
-  }
-
   async showAll() {
     //await votes.getAllVotes();
     console.time('getAll');
@@ -163,7 +141,9 @@ export class Links {
   }
 
   async showAllLinksByAccount(address) {
-    const linksId = await this.getAllLinksByAccount(address);
+    console.time('Grabbing linksByAccount');
+    const linksId = await linksModel.getAllLinksByAccount(address);
+    console.timeEnd('Grabbing linksByAccount');
 
     let options: string[] = [];
 
@@ -229,12 +209,12 @@ export class Links {
 
   addVote(address, id) {
     const link = this.dataById.get(id);
-    link.votes.push({from: address});
+    link.votes.push(address);
     this.dataById.set(id, link);
 
     for(let i = 0, j = this.data.length; i < j; i++) {
       if(this.data[i].id === id) {
-        this.data[i].votes.push({from: address});
+        this.data[i].votes.push(address);
       }
     }
   }

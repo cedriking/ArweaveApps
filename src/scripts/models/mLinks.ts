@@ -3,6 +3,8 @@ import axios from 'axios';
 import {App, arweave} from "../app";
 import {ILink} from "../interfaces/iLink";
 import $ from 'cash-dom';
+import { VotesModel } from "./mVotes";
+import { votes } from "../votes";
 
 export class LinksModel {
   private threads = 8;
@@ -83,7 +85,7 @@ export class LinksModel {
     return html;
   }
 
-  async getTransactionDetails(transactions: {id: string}[]): Promise<ILink[]> {
+  async getTransactionDetails(transactions: string[]): Promise<ILink[]> {
     return new Promise(resolve => {
       const total = transactions.length;
       const toLoad = total > this.threads ? this.threads : total;
@@ -96,13 +98,13 @@ export class LinksModel {
           return;
         }
 
-        const id = transactions[index].id;
+        const id = transactions[index];
         let storedData = window.localStorage.getItem(`${App.appVersion}-${id}`);
         if(storedData) {
           data.push(JSON.parse(storedData));
         } else {
           try {
-            const txRow = await this.getTransactionDetailsById(transactions[index].id, transactions[index]);
+            const txRow = await this.getTransactionDetailsById(id);
             data.push(txRow);
 
             try {
@@ -127,7 +129,38 @@ export class LinksModel {
     });
   }
 
-  async getTransactionDetailsById(txId: string, transaction): Promise<ILink> {
+  async getAllLinksByAccount(address: string): Promise<string[]> {
+    const transactions = await arweave.arql({
+      op: 'equals',
+      expr1: 'from',
+      expr2: address
+    });
+
+    let current = -1;
+    const result: string[] = [];
+    const go = async (index = 0) => {
+      console.log(`${transactions.length} - ${index}`);
+      if(index >= transactions.length) return true;
+
+      const tags = await this.getTransactionTags(transactions[index]);
+      if(tags.contentType && (tags.contentType === 'text/html' || tags.contentType === 'application/x.arweave-manifest+json')) {
+        result.push(transactions[index]);
+      }
+
+      return go(++current);
+    };
+
+    const gos = [];
+    for(let i = 0; i < this.threads; i++) {
+      gos.push(go(++current));
+    }
+
+    await Promise.all(gos);
+
+    return result;
+  }
+
+  async getTransactionDetailsById(txId: string): Promise<ILink> {
     // @ts-ignore
     let txRow:ILink = {};
 
@@ -149,12 +182,27 @@ export class LinksModel {
       txRow[key.toLowerCase().replace(/-([a-z])/g, (g) => g[1].toUpperCase())] = Utils.stripTags(atob(tag.value));
     });
 
-    const tmpVotes: Set<string> = new Set();
-    for(let k = 0, l = transaction.votes.length; k < l; k++) {
-      tmpVotes.add(transaction.votes[k].id);
-    }
-    txRow.votes = Array.from(tmpVotes);
+    const votesModel = new VotesModel();
+    txRow.votes = await votesModel.getVotesByLinkId(txId);
 
     return txRow;
+  }
+
+  async getTransactionTags(txId: string): Promise<{contentType?: string}> {
+    const tags = {};
+    try {
+      const res = await axios(`https://arweave.net/tx/${txId}`);
+      const tx = res.data;
+
+      tx.tags.forEach(tag => {
+        const key = Utils.stripTags(atob(tag.name));
+        tags[key.toLowerCase().replace(/-([a-z])/g, (g) => g[1].toUpperCase())] = Utils.stripTags(atob(tag.value));
+      });
+    } catch(e) {
+      console.log(`Error getting tx tags requests for ${txId}`);
+      return this.getTransactionTags(txId);
+    }
+    
+    return tags;
   }
 }

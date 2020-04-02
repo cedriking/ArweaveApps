@@ -140,21 +140,6 @@ export class Links {
     this.contentLoaded = true;
   }
 
-  async showAllLinksByAccount(address) {
-    console.time('Grabbing linksByAccount');
-    const linksId = await linksModel.getAllLinksByAccount(address);
-    console.timeEnd('Grabbing linksByAccount');
-
-    let options: string[] = [];
-
-    for(let i = 0, j = linksId.length; i < j; i++) {
-      options.push(`<option>${linksId[i]}</option>`);
-    }
-
-    $('#link-link').html(options.join());
-    M.FormSelect.init(document.querySelectorAll('select'));
-  }
-
   async publish() {
     if(!accounts.isLoggedIn) {
       accounts.showLogin();
@@ -219,6 +204,32 @@ export class Links {
     }
   }
 
+  private async validateLink($link): Promise<boolean> {
+    const match = $link.val().toString().match(/arweave\.net\/([\d\w-]+)/);
+    if(match && match.length === 2) {
+      $('#link-link').val(match[1]);
+    }
+
+    const txId = $link.val().toString();
+    if(txId.length !== 43) {
+      $link.addClass('invalid');
+      return false;
+    }
+    const res = await linksModel.getTransaction(txId);
+    //console.log(res);
+    
+    if(!res 
+      || !(res.contentType === 'text/html' 
+      || res.contentType === 'application/x.arweave-manifest+json') 
+      || await arweave.wallets.ownerToAddress(res.owner) !== accounts.getWalletAddress
+    ) {
+      $link.addClass('invalid');
+      return false;
+    }
+
+    return true;
+  }
+
   _imageConvert(file) {
     const reader = new FileReader();
     reader.onload = img => {
@@ -248,6 +259,11 @@ export class Links {
       $('#imgfile').trigger('click');
     });
 
+    $('#link-link').on('keyup', async (e) => {
+      const $link = $('#link-link').removeClass('invalid');
+      await this.validateLink($link);
+    });
+
     $('#imgfile').on('change', (e) => {
       // @ts-ignore
       this._imageConvert(e.target.files[0]);
@@ -256,7 +272,13 @@ export class Links {
     $('#publish-form').on('submit', e => {
       e.preventDefault();
 
-      this.publish();
+      this.validateLink($('#link-link')).then(r => {
+        if(r) {
+          this.publish();
+        } else {
+          M.toast({html: 'Invalid link or you don\'t own this link.'}, 3000);
+        }
+      }).catch(console.log);
     });
 
     $('.js-go-publish').on('click', e => {

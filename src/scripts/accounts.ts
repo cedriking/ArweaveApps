@@ -96,8 +96,6 @@ class Accounts {
 
       this.mLoginModal.close();
       app.hashChanged();
-
-      links.showAllLinksByAccount(address).catch(console.log);
     };
     fileReader.readAsText(ev.target.files[0]);
   }

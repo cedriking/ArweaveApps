@@ -47,7 +47,8 @@ export class LinksModel {
         collection = `<div data-category="${link.category}" class="col s12"><h5 class="white-text" style="${Utils.gradients[isCategory]}; margin: 0; margin-bottom: -7px; padding: 15px 10px;">${link.category.toUpperCase()}</h5><ul class="collection">`;
       }
 
-      const img = link.appIcon ? `<img src="${link.appIcon}" alt="${link.title}" />` : '<img class="empty-img" />';
+      //const img = link.appIcon ? `<img src="${link.appIcon}" alt="${link.title}" />` : '<img class="empty-img" />';
+      const img = '<img class="empty-img" />';
 
       collection += `
                     <li class="collection-item avatar" data-id="${link.id}" data-linkid="${link.linkId}" data-repository="${Utils.toSlug(link.title)}">

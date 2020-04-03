@@ -143,7 +143,7 @@ export class Links {
   async publish() {
     if(!accounts.isLoggedIn) {
       accounts.showLogin();
-      return M.toast({html: 'Login and then hit publish again.'});
+      return M.toast({html: 'Please Login and then hit publish again.'});
     }
 
     // Validate that all the fields are valid and filled
@@ -172,7 +172,7 @@ export class Links {
       title,
       category,
       linkId,
-      appIcon: this.appIcon,
+      // appIcon: this.appIcon,
       description
     };
 

@@ -10,7 +10,7 @@ export const db = new DB('arapps');
 
 export class App {
   static appName = 'arweaveapps';
-  static appVersion = '0.1.6';
+  static appVersion = '0.2.1';
 
   constructor() {
     window.onhashchange = () => this.hashChanged();

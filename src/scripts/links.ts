@@ -3,7 +3,7 @@ import * as M from 'materialize-css';
 import hashicon from 'hashicon';
 import {App, arweave} from "./app";
 import {accounts} from "./accounts";
-import {Utils} from "./utils";
+import {Utils} from "./utils/utils";
 import {LinksModel} from "./models/mLinks";
 import {ILink} from "./interfaces/iLink";
 
@@ -218,7 +218,8 @@ export class Links {
     const res = await linksModel.getTransaction(txId);
     //console.log(res);
     
-    if(!res 
+    if(!res
+      || !res.contentType 
       || !(res.contentType === 'text/html' 
       || res.contentType === 'application/x.arweave-manifest+json') 
       || await arweave.wallets.ownerToAddress(res.owner) !== accounts.getWalletAddress
@@ -276,7 +277,7 @@ export class Links {
         if(r) {
           this.publish();
         } else {
-          M.toast({html: 'Invalid link or you don\'t own this link.'}, 3000);
+          M.toast({html: 'Invalid link or you don\'t own this link.'});
         }
       }).catch(console.log);
     });

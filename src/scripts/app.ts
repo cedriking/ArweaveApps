@@ -3,8 +3,10 @@ import Arweave from 'arweave/web';
 import {accounts} from "./accounts";
 import {links} from "./links";
 import {votes} from "./votes";
+import { DB } from './utils/db';
 
 export const arweave = Arweave.init({});
+export const db = new DB('arapps');
 
 export class App {
   static appName = 'arweaveapps';

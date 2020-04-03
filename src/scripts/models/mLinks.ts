@@ -1,16 +1,17 @@
-import {Utils} from "../utils";
+import {Utils} from "../utils/utils";
 import axios from 'axios';
-import {App, arweave} from "../app";
+import {arweave, db} from "../app";
 import {ILink} from "../interfaces/iLink";
 import $ from 'cash-dom';
 import { VotesModel } from "./mVotes";
-import { votes } from "../votes";
 
 export class LinksModel {
   private threads = 8;
+  private tableName = 'links';
 
-  constructor(threads = 8) {
+  constructor(threads = 8, dbTableName = 'links') {
     this.threads = threads;
+    this.tableName = dbTableName;
   }
 
   async sortByVotes(data) {
@@ -24,21 +25,6 @@ export class LinksModel {
     }
 
     return dataById;
-  }
-
-  async getUserPermawebs(options) {
-    const optionsHtml = ['<option disabled selected>Select your permaweb</option>'];
-    options.forEach((option) => {
-      let title = option.data.match(/<title[^>]*>([^<]+)<\/title>/);
-      if(title && title.length > 1) {
-        title = title[1];
-      } else {
-        title = "untitledlink";
-      }
-      optionsHtml.push(`<option value="${option.id}">${title} (${option.id})</option>`);
-    });
-
-    return optionsHtml;
   }
 
   async convertAllToHtml(data) {
@@ -99,20 +85,11 @@ export class LinksModel {
         }
 
         const id = transactions[index];
-        let storedData = window.localStorage.getItem(`${App.appVersion}-${id}`);
-        if(storedData) {
-          data.push(JSON.parse(storedData));
-        } else {
-          try {
-            const txRow = await this.getTransactionDetailsById(id);
-            data.push(txRow);
-
-            try {
-              window.localStorage.setItem(`${App.appVersion}-${id}`, JSON.stringify(txRow));
-            } catch (e) {}
-          } catch (e) {
-            console.log(e);
-          }
+        try {
+          const txRow = await this.getTransactionDetailsById(id);
+          data.push(txRow);
+        } catch (e) {
+          console.log(e);
         }
 
         $('.jsLinksLoaded').text(` ${++loaded}/${total}`);
@@ -130,8 +107,18 @@ export class LinksModel {
   }
 
   async getTransactionDetailsById(txId: string): Promise<ILink> {
+    let txRow:ILink = await db.findOne(this.tableName, txId);
+
+    if(txRow) {
+      console.log(`from db`);
+      const votesModel = new VotesModel();
+      txRow.votes = await votesModel.getVotesByLinkId(txId);
+
+      db.upsert(this.tableName, txRow, txId).catch(console.log);
+      return txRow;
+    }
     // @ts-ignore
-    let txRow:ILink = {};
+    txRow = {};
 
     const res = await axios(`https://arweave.net/tx/${txId}`);
     const tx = res.data;
@@ -154,12 +141,22 @@ export class LinksModel {
     const votesModel = new VotesModel();
     txRow.votes = await votesModel.getVotesByLinkId(txId);
 
+    db.upsert(this.tableName, txRow, txId).catch(console.log);
+
     return txRow;
   }
 
   async getTransaction(txId: string): Promise<any> {
-    let result = {};
+    let result = await db.findOne(this.tableName, txId);
+
+    if(result) {
+      console.log(`from db`);
+      return result;
+    }
+    result = {};
+
     try {
+      console.log(`Checking tx ${txId}`);
       const res = await axios(`https://arweave.net/tx/${txId}`);
       const tx = res.data;
 
@@ -172,7 +169,9 @@ export class LinksModel {
     } catch(e) {
       console.log(`Error getting tx tags requests for ${txId}`);
     }
-    
+
+    db.upsert(this.tableName, result, txId).catch(console.log);
+
     return result;
   }
 }

@@ -1,27 +1,13 @@
-import {Utils} from "../utils";
 import axios from 'axios';
-import {App, arweave} from "../app";
-import {ILink} from "../interfaces/iLink";
-import $ from 'cash-dom';
+import {App, arweave, db} from "../app";
 
 export class VotesModel {
   private threads = 8;
+  private tableName = 'votes';
 
-  constructor(threads = 8) {
+  constructor(threads = 8, dbTableName = 'votes') {
     this.threads = threads;
-  }
-
-  async sortByVotes(data) {
-    return data.sort((a, b) => a.votes.length < b.votes.length? 1 : a.votes.length > b.votes.length? -1 : 0);
-  }
-
-  async createDataById(data) {
-    const dataById = new Map();
-    for(let i = 0, j = data.length; i < j; i++) {
-      dataById.set(data[i].id, data[i]);
-    }
-
-    return dataById;
+    this.tableName = dbTableName;
   }
 
   async getVotesByLinkId(linkId: string): Promise<string[]> {
@@ -41,69 +27,44 @@ export class VotesModel {
               },
               expr2: {
                   op: 'equals',
-                  expr1: 'App-Link',
+                  expr1: 'Link-Id',
                   expr2: linkId
               }
           }
       });
 
-      return transactions;
-  }
-
-  async getTransactionDetails(transactions: string[]): Promise<ILink[]> {
-    return new Promise(resolve => {
-      const total = transactions.length;
-      const toLoad = total > this.threads ? this.threads : total;
-      let current = 0;
-      let data = [];
-
-      const go = async(index) => {
-        if(total === index) {
-          return;
+      let current = -1;
+      let result = [];
+      const go = async (index = 0) => {
+        if(index >= transactions.length) {
+          return true;
         }
 
-        const id = transactions[index];
-        let storedData = window.localStorage.getItem(`${App.appVersion}-${id}`);
-        if(storedData) {
-          data.push(JSON.parse(storedData));
+        let found = await db.findOne(this.tableName, transactions[index]);
+        if(found) {
+          // @ts-ignore
+          result.push(found.address);
         } else {
           try {
-            const txRow = await this.getTransactionDetailsById(id);
-            data.push(txRow);
-
-            try {
-              window.localStorage.setItem(`${App.appVersion}-${id}`, JSON.stringify(txRow));
-            } catch (e) {}
-          } catch (e) {
-            console.log(e);
-          }
+            const res = await axios.get(`https://arweave.net/tx/${transactions[index]}`);
+            if(res && res.data && res.data.owner) {
+              const address = await arweave.wallets.ownerToAddress(res.data.owner);
+              result.push(address);
+              db.upsert(this.tableName, {id: transactions[index], address}, transactions[index]).catch(console.log);
+            }
+          } catch(e) {}
         }
 
-        if(current === total) {
-          return resolve(data);
-        }
         return go(++current);
       };
 
-      current = toLoad;
-      for(let i = 0; i < toLoad; i++) {
-        go(i).catch(console.log);
+      const j = transactions.length > this.threads? this.threads : transactions.length;
+      const gos = [];
+      for(let i = 0; i < j; i++) {
+        gos.push(go(++current));
       }
-    });
-  }
+      await Promise.all(gos);
 
-  async getTransactionDetailsById(txId: string): Promise<any> {
-    // @ts-ignore
-    let txRow = {};
-
-    const res = await axios(`https://arweave.net/tx/${txId}`);
-    const tx = res.data;
-
-    tx.tags.forEach(tag => {
-      const key = Utils.stripTags(atob(tag.name));
-      txRow[key.toLowerCase().replace(/-([a-z])/g, (g) => g[1].toUpperCase())] = Utils.stripTags(atob(tag.value));
-    });
-
-    return txRow;
+      return Array.from(new Set(result));
   }
 }

@@ -1,4 +1,13 @@
 export class Utils {
+  static async createDataById(data): Promise<Map<string, any>> {
+    const dataById = new Map<string, any>();
+    for(let i = 0, j = data.length; i < j; i++) {
+      dataById.set(data[i].id, data[i]);
+    }
+
+    return dataById;
+  }
+
   static capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }

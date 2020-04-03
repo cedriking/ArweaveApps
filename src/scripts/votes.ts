@@ -91,7 +91,7 @@ export class Votes {
     for(let k = 0, l = link.votes.length; k < l; k++) {
       const vote = link.votes[k];
 
-      if(vote.from === accounts.getWalletAddress) {
+      if(vote === accounts.getWalletAddress) {
         return M.toast({html: 'You already voted for this link.'});
       }
     }

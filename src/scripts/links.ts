@@ -7,8 +7,6 @@ import {Utils} from "./utils/utils";
 import {LinksModel} from "./models/mLinks";
 import {ILink} from "./interfaces/iLink";
 
-const linksModel = new LinksModel();
-
 export class Links {
   static CATEGORIES() {
     return [
@@ -35,6 +33,7 @@ export class Links {
   private appIcon: string = '';
   private contentLoaded: boolean = false;
   private categories: Set<string> = new Set();
+  private linksModel = new LinksModel();
 
   public get getDataById() {
     return this.dataById;
@@ -50,7 +49,8 @@ export class Links {
     }
   }
 
-  init() {
+  async init() {
+    await this.linksModel.init();
     this._events();
     this.showAll().catch(console.log);
     this._showCategories();
@@ -92,7 +92,7 @@ export class Links {
 
     console.time('grabbing app details');
     // @ts-ignore
-    this.data = await linksModel.getTransactionDetails(transactions);
+    this.data = await this.linksModel.getTransactionDetails(transactions);
     console.timeEnd('grabbing app details');
 
     this.dataById = new Map();
@@ -109,9 +109,9 @@ export class Links {
       }
 
       // Sort by votes
-      tmp = await linksModel.sortByVotes(tmp);
+      tmp = await this.linksModel.sortByVotes(tmp);
 
-      this.dataById = await linksModel.createDataById(tmp);
+      this.dataById = await Utils.createDataById(tmp);
     }
     console.timeEnd('filtering apps');
 
@@ -125,7 +125,7 @@ export class Links {
     console.timeEnd('getAll');
 
     console.time('grabbing html');
-    let html = await linksModel.convertAllToHtml({dataById: this.dataById, categories: Links.CATEGORIES()});
+    let html = await this.linksModel.convertAllToHtml({dataById: this.dataById, categories: Links.CATEGORIES()});
     console.timeEnd('grabbing html');
     $('.js-app-list').html(html);
 
@@ -215,7 +215,7 @@ export class Links {
       $link.addClass('invalid');
       return false;
     }
-    const res = await linksModel.getTransaction(txId);
+    const res = await this.linksModel.getTransaction(txId);
     //console.log(res);
     
     if(!res

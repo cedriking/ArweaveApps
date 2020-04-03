@@ -8,23 +8,27 @@ import { VotesModel } from "./mVotes";
 export class LinksModel {
   private threads = 8;
   private tableName = 'links';
+  private cacheLinks = new Map<string, any>();
 
   constructor(threads = 8, dbTableName = 'links') {
     this.threads = threads;
     this.tableName = dbTableName;
   }
 
-  async sortByVotes(data) {
-    return data.sort((a, b) => a.votes.length < b.votes.length? 1 : a.votes.length > b.votes.length? -1 : 0);
+  async init() {
+    await this.getAllSaved();
+    return true;
   }
 
-  async createDataById(data) {
-    const dataById = new Map();
-    for(let i = 0, j = data.length; i < j; i++) {
-      dataById.set(data[i].id, data[i]);
-    }
+  private async getAllSaved(): Promise<boolean> {
+    const data = await db.find(this.tableName);
+    this.cacheLinks = await Utils.createDataById(data);
 
-    return dataById;
+    return true;
+  }
+
+  async sortByVotes(data) {
+    return data.sort((a, b) => a.votes.length < b.votes.length? 1 : a.votes.length > b.votes.length? -1 : 0);
   }
 
   async convertAllToHtml(data) {
@@ -107,14 +111,14 @@ export class LinksModel {
   }
 
   async getTransactionDetailsById(txId: string): Promise<ILink> {
-    let txRow:ILink = await db.findOne(this.tableName, txId);
+    let txRow:ILink = this.cacheLinks.get(txId);
 
     if(txRow) {
-      console.log(`from db`);
       const votesModel = new VotesModel();
       txRow.votes = await votesModel.getVotesByLinkId(txId);
 
       db.upsert(this.tableName, txRow, txId).catch(console.log);
+      this.cacheLinks.set(txId, txRow);
       return txRow;
     }
     // @ts-ignore
@@ -147,10 +151,9 @@ export class LinksModel {
   }
 
   async getTransaction(txId: string): Promise<any> {
-    let result = await db.findOne(this.tableName, txId);
+    let result = this.cacheLinks.get(txId);
 
     if(result) {
-      console.log(`from db`);
       return result;
     }
     result = {};

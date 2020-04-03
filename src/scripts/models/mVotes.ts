@@ -1,13 +1,26 @@
 import axios from 'axios';
 import {App, arweave, db} from "../app";
+import { Utils } from '../utils/utils';
 
 export class VotesModel {
   private threads = 8;
   private tableName = 'votes';
+  private cacheVotes = new Map<string, any>();
 
   constructor(threads = 8, dbTableName = 'votes') {
     this.threads = threads;
     this.tableName = dbTableName;
+  }
+
+  async init() {
+    await this.getAllSaved();
+  }
+
+  private async getAllSaved(): Promise<boolean> {
+    const data = await db.find(this.tableName);
+    this.cacheVotes = await Utils.createDataById(data);
+
+    return true;
   }
 
   async getVotesByLinkId(linkId: string): Promise<string[]> {
@@ -40,7 +53,7 @@ export class VotesModel {
           return true;
         }
 
-        let found = await db.findOne(this.tableName, transactions[index]);
+        let found = this.cacheVotes.get(transactions[index]);
         if(found) {
           // @ts-ignore
           result.push(found.address);

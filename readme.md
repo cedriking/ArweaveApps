@@ -8,6 +8,9 @@ The main purpose of the site is to work as an indexer for the Arweave permaweb.
 
 ### ChangeLog
 ```
+v0.2.2 (https://arweave.net/-qwd78XBQn9kyImIebHfRvYZ_wh20PPep1bd6mqh074)
+- Updated full decentralization of gateways, to work with perma.online and future gateways.
+
 v0.2.1 (https://arweave.net/yTHDaOcab_pkmyMCUQv2B9nkZlerT1Ox7dsayDe5ako)
 - Updated cache to use webSQL and improved cache load from ~20sec to ~8sec
 - Replaced GraphQL to ArQL, temporary rollback

@@ -4,11 +4,8 @@ import {accounts} from "./accounts";
 import {links} from "./links";
 import {App, arweave} from "./app";
 import {spawn} from "threads";
-import {VotesWorker} from "./workers/votes";
 import {Pool} from "threads/dist";
 import "threads/register";
-
-const pool = Pool(() => spawn<VotesWorker>(new Worker("./workers/votes.ts")), 2 /* optional size */);
 
 export class Votes {
   private votes = [];
@@ -61,11 +58,6 @@ export class Votes {
         return txRow;
       }));
     }
-
-    pool.queue(async votesWorker => {
-      this.votes = await votesWorker.getVotes(votes);
-    });
-    await pool.completed();
 
     for(let i = 0, j = this.votes.length; i < j; i++) {
       this.votesByLinkId.set(this.votes[i]['link-id'], this.votes[i].votes);

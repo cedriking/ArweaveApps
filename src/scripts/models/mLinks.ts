@@ -35,6 +35,8 @@ export class LinksModel {
     const {dataById, categories} = data;
     const _categories = new Map();
 
+    const baseUrl = `${arweave.api.config.protocol}://${arweave.api.config.host}:${arweave.api.config.port}`;
+
     let html = '';
     dataById.forEach(async link => {
       const isCategory = categories.findIndex(l => l.toLowerCase() === link.category.toLowerCase());
@@ -57,7 +59,7 @@ export class LinksModel {
                             <span class="app-votes">${link.votes.length}</span>
                         </div>
                     
-                        <a href="https://arweave.net/${link.linkId}" target="_blank" rel="nofollow" class="js-addy-link">
+                        <a href="${baseUrl}/${link.linkId}" target="_blank" rel="nofollow" class="js-addy-link">
                             ${img}
                             <div class="title">${link.title}</div>
                             <small>${link.description}</small>
@@ -125,7 +127,7 @@ export class LinksModel {
     // @ts-ignore
     txRow = {};
 
-    const res = await axios(`https://arweave.net/tx/${txId}`);
+    const res = await arweave.api.get(`/tx/${txId}`);
     const tx = res.data;
 
     const data = JSON.parse(atob(tx.data));
@@ -161,7 +163,7 @@ export class LinksModel {
 
     try {
       console.log(`Checking tx ${txId}`);
-      const res = await axios(`https://arweave.net/tx/${txId}`);
+      const res = await arweave.api.get(`/tx/${txId}`);
       const tx = res.data;
 
       result = tx;

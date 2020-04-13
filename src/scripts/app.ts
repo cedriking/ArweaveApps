@@ -6,11 +6,12 @@ import {votes} from "./votes";
 import { DB } from './utils/db';
 
 export const arweave = Arweave.init({});
+
 export const db = new DB('arapps');
 
 export class App {
   static appName = 'arweaveapps';
-  static appVersion = '0.2.1';
+  static appVersion = '0.2.2';
 
   constructor() {
     window.onhashchange = () => this.hashChanged();

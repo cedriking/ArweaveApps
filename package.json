@@ -1,6 +1,6 @@
 {
   "name": "arweaveapps",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "description": "ArweaveApps is a directory for all the Arweave apps available out there, add yours now.",
   "main": "index.js",

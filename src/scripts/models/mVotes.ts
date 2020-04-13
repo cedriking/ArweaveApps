@@ -59,7 +59,7 @@ export class VotesModel {
           result.push(found.address);
         } else {
           try {
-            const res = await axios.get(`https://arweave.net/tx/${transactions[index]}`);
+            const res = await arweave.api.get(`/tx/${transactions[index]}`);
             if(res && res.data && res.data.owner) {
               const address = await arweave.wallets.ownerToAddress(res.data.owner);
               result.push(address);

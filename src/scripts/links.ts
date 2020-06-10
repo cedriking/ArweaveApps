@@ -89,7 +89,6 @@ export class Links {
       }
     });
 
-
     console.time('grabbing app details');
     // @ts-ignore
     this.data = await this.linksModel.getTransactionDetails(transactions);

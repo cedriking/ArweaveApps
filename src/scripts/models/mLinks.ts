@@ -1,5 +1,4 @@
 import {Utils} from "../utils/utils";
-import axios from 'axios';
 import {arweave, db} from "../app";
 import {ILink} from "../interfaces/iLink";
 import $ from 'cash-dom';

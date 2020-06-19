@@ -4,9 +4,10 @@ import {accounts} from "./accounts";
 import {links} from "./links";
 import {votes} from "./votes";
 import { DB } from './utils/db';
+import PST from './utils/pst';
 
+export const pst = new PST('CgTaSphiS39GHyXp13o4nhpmj_DcDM7b37Rnt8lmYIk');
 export const arweave = Arweave.init({});
-
 export const db = new DB('arapps');
 
 export class App {

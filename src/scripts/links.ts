@@ -1,7 +1,7 @@
 import $ from 'cash-dom';
 import * as M from 'materialize-css';
 import hashicon from 'hashicon';
-import {App, arweave} from "./app";
+import {App, arweave, pst} from "./app";
 import {accounts} from "./accounts";
 import {Utils} from "./utils/utils";
 import {LinksModel} from "./models/mLinks";
@@ -186,6 +186,23 @@ export class Links {
 
     await arweave.transactions.sign(tx, accounts.getWallet);
     console.log(tx.id);
+
+    // Adding fee
+    const walletBalance = await arweave.wallets.getBalance(accounts.getWalletAddress);
+    const balanceAR = await arweave.ar.winstonToAr(walletBalance);
+
+    if(+balanceAR < 0.01000001) {
+      return M.toast({html: 'Insufficent balance to submit.'});
+    }
+
+    const pstRecipient = await pst.getPSTAllocation();
+    const pstTx = await arweave.createTransaction({
+      target: pstRecipient,
+      quantity: arweave.ar.arToWinston('0.01')
+    }, accounts.getWallet);
+
+    await arweave.transactions.sign(pstTx, accounts.getWallet);
+    await arweave.transactions.post(pstTx);
     await arweave.transactions.post(tx);
 
     return M.toast({html: 'App sent, will be available after one block.'});

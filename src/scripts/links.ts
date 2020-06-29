@@ -27,12 +27,11 @@ export class Links {
       "health",
       "ETH dapps",
       "EOS dapps"
-    ];
+    ].sort((a, b) => a.toLowerCase() < b.toLowerCase()? -1 : a.toLowerCase() > b.toLowerCase()? 1 : 0);
   }
 
   private data: ILink[] = [];
   private dataById: Map<string, ILink> = new Map();
-  private appIcon: string = '';
   private contentLoaded: boolean = false;
   private categories: Set<string> = new Set();
   private linksModel = new LinksModel();

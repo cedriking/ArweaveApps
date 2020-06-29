@@ -113,6 +113,16 @@ export class Utils {
     'background: #B35D34;\n' +
     'background: -webkit-linear-gradient(right, #B35D34, #958B2A);\n' +
     'background: -moz-linear-gradient(right, #B35D34, #958B2A);\n' +
-    'background: linear-gradient(to left, #B35D34, #958B2A);'
+    'background: linear-gradient(to left, #B35D34, #958B2A);',
+
+    `background: #0B486B;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #F56217, #0B486B);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #F56217, #0B486B); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    `,
+
+    `background: #2196f3;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #f44336, #2196f3);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #f44336, #2196f3); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    `
   ];
 }

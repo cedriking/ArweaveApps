@@ -24,7 +24,9 @@ export class Links {
       "storage",
       "identity",
       "energy",
-      "health"
+      "health",
+      "ETH dapps",
+      "EOS dapps"
     ];
   }
 

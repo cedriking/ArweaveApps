@@ -45,9 +45,7 @@ export class Links {
   }
 
   constructor() {
-    for(let i = 0, j = Links.CATEGORIES().length; i < j; i++) {
-      this.categories.add(Links.CATEGORIES()[i]);
-    }
+    this.categories = new Set([... Links.CATEGORIES()]);
   }
 
   async init() {
@@ -148,7 +146,7 @@ export class Links {
 
     // Validate that all the fields are valid and filled
     const title = Utils.stripTags($('#link-title').val().toString());
-    const category = Utils.stripTags($('#link-category').val().toString()).toLowerCase();
+    let category = Utils.stripTags($('#link-category').val().toString()).toLowerCase();
     const linkId = Utils.stripTags($('#link-link').val().toString());
     const description = Utils.stripTags($('#link-description').val().toString());
 
@@ -157,7 +155,10 @@ export class Links {
     }
 
     if(!this.categories.has(category)) {
-      return M.toast({html: 'Invalid category.'});
+      category = Utils.stripTags($('#link-category').val().toString());
+      if(!this.categories.has(category)) {
+        return M.toast({html: 'Invalid category.'});
+      }
     }
 
     if(description.length < 10 || description.length > 140) {

@@ -37,9 +37,12 @@ export class LinksModel {
     const baseUrl = `${arweave.api.config.protocol}://${arweave.api.config.host}:${arweave.api.config.port}`;
 
     let html = '';
+
     dataById.forEach(async link => {
       const isCategory = categories.findIndex(l => l.toLowerCase() === link.category.toLowerCase());
-      if(isCategory === -1) return true;
+      if(isCategory === -1) {
+        return true;
+      }
 
       let collection = '';
       if(_categories.has(link.category)) {
@@ -48,7 +51,6 @@ export class LinksModel {
         const gradient = Utils.gradients[isCategory] || (Utils.gradients[Math.random() * Utils.gradients.length]);
         collection = `<div data-category="${link.category}" class="col s12"><h5 class="white-text" style="${gradient}; margin: 0; margin-bottom: -7px; padding: 15px 10px;">${link.category.toUpperCase()}</h5><ul class="collection">`;
       }
-
       const img = '<img class="empty-img" />';
 
       collection += `
@@ -69,7 +71,10 @@ export class LinksModel {
     });
 
     const catsData = Array.from(_categories);
-    catsData.sort((a, b) => a[0] > b[0]? 1 : a[0] < b[0]? -1 : 0);
+
+    console.log(catsData);
+
+    catsData.sort((a, b) => a[0].toLowerCase() > b[0].toLowerCase()? 1 : a[0].toLowerCase() < b[0].toLowerCase()? -1 : 0);
     catsData.forEach(cat => {
       html += `${cat[1]}</ul></div>`;
     });

@@ -8,7 +8,7 @@ The main purpose of the site is to work as an indexer for the Arweave permaweb.
 
 ### ChangeLog
 ```
-v0.2.3 (https://arweave.net/w4v5TT4blOJ3AfBXxm0NdgD5szSNCP0lGCjUkoRC-xs)
+v0.2.3 (https://arweave.net/WW4mCviCRdD4zkqtf8TFLXGYZACKvfEn6axf4ShEoIg)
 - Added two new categories, ETH dapps and EOS dapps, that go with the bounty https://github.com/ArweaveTeam/Bounties/issues/28
 
 v0.2.2 (https://arweave.net/-qwd78XBQn9kyImIebHfRvYZ_wh20PPep1bd6mqh074)

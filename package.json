@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/materialize-css": "^1.0.7",
-    "arweave": "^1.6.0",
+    "arweave": "^1.10.1",
     "cash-dom": "^7.0.0",
     "hashicon": "^0.3.0",
     "materialize-css": "^1.0.0",
